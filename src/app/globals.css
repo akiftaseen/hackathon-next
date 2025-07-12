@@ -117,12 +117,13 @@ body {
 
 /* ANKID App Styles */
 .ankid-header {
-  background: linear-gradient(135deg, var(--md3-primary) 0%, var(--md3-secondary) 50%, var(--md3-tertiary) 100%);
+  background: var(--md3-primary);
   color: var(--md3-on-primary);
-  padding: 2rem 3rem; /* Increased padding */
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  padding: 2rem 3rem;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
   font-family: 'Feather', 'Fredoka', sans-serif;
   font-weight: 700;
+  border-bottom: 3px solid rgba(255, 255, 255, 0.1);
 }
 
 .ankid-title {
@@ -174,76 +175,82 @@ body {
   font-size: 1.25rem; /* Added explicit size */
 }
 
-/* Buttons - Much Bigger */
+/* Buttons - Refined and Modern */
 .ankid-button {
-  background: linear-gradient(135deg, var(--md3-primary), var(--md3-secondary));
+  background: var(--md3-primary);
   color: var(--md3-on-primary);
   border: none;
-  border-radius: 32px; /* Increased from 24px */
-  padding: 18px 36px; /* Increased from 12px 24px */
+  border-radius: 32px;
+  padding: 18px 36px;
   font-weight: 700;
-  font-size: 1.5rem; /* Increased from 1rem */
+  font-size: 1.5rem;
   cursor: pointer;
   transition: all 0.3s ease;
-  box-shadow: 0 4px 12px rgba(69, 191, 219, 0.3);
+  box-shadow: 0 4px 12px rgba(69, 191, 219, 0.25);
   font-family: 'Feather', 'Fredoka', sans-serif;
+  border: 2px solid transparent;
 }
 
 .ankid-button:hover {
-  transform: translateY(-2px) scale(1.05);
-  box-shadow: 0 8px 24px rgba(69, 191, 219, 0.4);
-  filter: brightness(1.1);
+  transform: translateY(-2px) scale(1.02);
+  box-shadow: 0 8px 24px rgba(69, 191, 219, 0.35);
+  background: #3db5d1;
+  border-color: rgba(255, 255, 255, 0.2);
 }
 
 .ankid-button:active {
-  transform: translateY(0) scale(1.02);
+  transform: translateY(0) scale(1.00);
+  box-shadow: 0 4px 12px rgba(69, 191, 219, 0.4);
 }
 
 .ankid-button-secondary {
-  background: linear-gradient(135deg, var(--md3-secondary), var(--md3-tertiary));
+  background: var(--md3-secondary);
   color: var(--md3-on-secondary);
   border: none;
-  border-radius: 32px; /* Increased from 24px */
-  padding: 18px 36px; /* Increased from 12px 24px */
+  border-radius: 32px;
+  padding: 18px 36px;
   font-weight: 700;
-  font-size: 1.5rem; /* Increased from 1rem */
+  font-size: 1.5rem;
   cursor: pointer;
   transition: all 0.3s ease;
-  box-shadow: 0 4px 12px rgba(245, 221, 89, 0.3);
+  box-shadow: 0 4px 12px rgba(245, 221, 89, 0.25);
   font-family: 'Feather', 'Fredoka', sans-serif;
+  border: 2px solid transparent;
 }
 
 .ankid-button-secondary:hover {
-  transform: translateY(-2px) scale(1.05);
-  box-shadow: 0 8px 24px rgba(245, 221, 89, 0.4);
-  filter: brightness(1.1);
+  transform: translateY(-2px) scale(1.02);
+  box-shadow: 0 8px 24px rgba(245, 221, 89, 0.35);
+  background: #f2d742;
+  border-color: rgba(255, 255, 255, 0.2);
 }
 
 /* Cards - Much Bigger */
 .ankid-card {
-  background: linear-gradient(135deg, rgba(255, 255, 255, 0.9), rgba(248, 250, 252, 0.9));
-  border-radius: 24px; /* Increased from 16px */
-  padding: 2.5rem; /* Increased from 1.5rem */
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-  border: 1px solid rgba(69, 191, 219, 0.2);
+  background: rgba(255, 255, 255, 0.95);
+  border-radius: 24px;
+  padding: 2.5rem;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  border: 2px solid rgba(69, 191, 219, 0.15);
   transition: all 0.3s ease;
   font-family: 'Feather', 'Fredoka', sans-serif;
-  font-size: 1.2rem; /* Added larger base font size */
+  font-size: 1.2rem;
 }
 
 .ankid-card:hover {
-  transform: translateY(-4px) rotate(1deg);
-  box-shadow: 0 8px 32px rgba(69, 191, 219, 0.2);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(69, 191, 219, 0.15);
   border-color: var(--md3-primary);
+  background: rgba(255, 255, 255, 1);
 }
 
-/* Progress bars */
+/* Progress bars - Clean and Simple */
 .ankid-progress {
-  background: linear-gradient(90deg, var(--md3-primary), var(--md3-secondary), var(--md3-tertiary));
+  background: var(--md3-primary);
   height: 12px;
   border-radius: 24px;
   transition: all 0.5s ease;
-  box-shadow: 0 2px 8px rgba(69, 191, 219, 0.3);
+  box-shadow: 0 2px 8px rgba(69, 191, 219, 0.2);
   position: relative;
   overflow: hidden;
 }
@@ -255,7 +262,7 @@ body {
   left: -100%;
   width: 100%;
   height: 100%;
-  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent);
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
   animation: shimmer 2s infinite;
 }
 
@@ -268,20 +275,21 @@ body {
 }
 
 .ankid-stat-card {
-  background: linear-gradient(135deg, rgba(255, 255, 255, 0.95), rgba(69, 191, 219, 0.1));
-  border-radius: 24px; /* Increased from 16px */
-  padding: 2.5rem; /* Increased from 1.5rem */
+  background: rgba(255, 255, 255, 0.95);
+  border-radius: 24px;
+  padding: 2.5rem;
   text-align: center;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-  border: 2px solid transparent;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  border: 2px solid rgba(69, 191, 219, 0.15);
   transition: all 0.3s ease;
   font-family: 'Feather', 'Fredoka', sans-serif;
 }
 
 .ankid-stat-card:hover {
-  transform: scale(1.05) rotate(-1deg);
+  transform: scale(1.02) translateY(-2px);
   border-color: var(--md3-primary);
-  box-shadow: 0 8px 24px rgba(69, 191, 219, 0.3);
+  box-shadow: 0 8px 24px rgba(69, 191, 219, 0.15);
+  background: rgba(255, 255, 255, 1);
 }
 
 .ankid-stat-number {
@@ -309,22 +317,22 @@ body {
 }
 
 .ankid-action-card {
-  background: linear-gradient(135deg, rgba(255, 255, 255, 0.9), rgba(245, 221, 89, 0.1));
-  border-radius: 24px; /* Increased from 16px */
-  padding: 2.5rem; /* Increased from 1.5rem */
+  background: rgba(255, 255, 255, 0.95);
+  border-radius: 24px;
+  padding: 2.5rem;
   cursor: pointer;
   transition: all 0.3s ease;
-  border: 2px solid transparent;
+  border: 2px solid rgba(245, 221, 89, 0.15);
   text-align: center;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
   font-family: 'Feather', 'Fredoka', sans-serif;
 }
 
 .ankid-action-card:hover {
-  transform: translateY(-4px) scale(1.02);
+  transform: translateY(-2px) scale(1.01);
   border-color: var(--md3-secondary);
-  box-shadow: 0 8px 32px rgba(245, 221, 89, 0.3);
-  background: linear-gradient(135deg, rgba(255, 255, 255, 0.95), rgba(245, 221, 89, 0.2));
+  box-shadow: 0 8px 24px rgba(245, 221, 89, 0.2);
+  background: rgba(255, 255, 255, 1);
 }
 
 .ankid-action-icon {
