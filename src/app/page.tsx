@@ -546,6 +546,11 @@ export default function ANKIDApp() {
       setCurrentMessage('');
       setIsLoading(true);
       
+      // Briefly speak back the user's message for confirmation
+      setTimeout(() => {
+        speakText(`I heard: ${spokenText}`);
+      }, 100);
+      
       // Stop listening while processing
       if (recognitionRef.current && isListening) {
         recognitionRef.current.stop();
@@ -849,28 +854,48 @@ WRITING STYLE:
           const rating = JSON.parse(ratingText);
           setConversationRating(rating);
           setShowRating(true);
+          
+          // Speak the rating feedback out loud
+          setTimeout(() => {
+            const ratingMessage = `Conversation complete! Your score is ${rating.score} out of 10. ${rating.feedback}`;
+            speakText(ratingMessage);
+          }, 500);
         } catch (parseError) {
           console.error('Failed to parse rating JSON:', parseError);
           // Fallback rating
-          setConversationRating({
+          const fallbackRating = {
             score: 7,
             feedback: "You did a great job sharing what you know! You explained things clearly and showed good understanding of the topic.",
             strengths: ["You participated really well!", "You shared your knowledge clearly", "You stayed focused on learning"],
             improvements: ["Try exploring this topic in more detail", "Practice explaining the connections between different parts", "Look up some fun facts about this subject"]
-          });
+          };
+          setConversationRating(fallbackRating);
           setShowRating(true);
+          
+          // Speak the fallback rating feedback out loud
+          setTimeout(() => {
+            const ratingMessage = `Conversation complete! Your score is ${fallbackRating.score} out of 10. ${fallbackRating.feedback}`;
+            speakText(ratingMessage);
+          }, 500);
         }
         
       } catch (error) {
         console.error('Error generating rating:', error);
         // Fallback rating
-        setConversationRating({
+        const errorFallbackRating = {
           score: 7,
           feedback: "Thanks for having a great conversation with me! You showed that you really want to learn and share knowledge.",
           strengths: ["You joined in actively", "You shared what you know", "You kept trying to learn"],
           improvements: ["Keep practicing and learning new things", "Try reading more about topics you're curious about", "Practice explaining things to friends or family"]
-        });
+        };
+        setConversationRating(errorFallbackRating);
         setShowRating(true);
+        
+        // Speak the error fallback rating feedback out loud
+        setTimeout(() => {
+          const ratingMessage = `Conversation complete! Your score is ${errorFallbackRating.score} out of 10. ${errorFallbackRating.feedback}`;
+          speakText(ratingMessage);
+        }, 500);
       } finally {
         setIsGeneratingRating(false);
       }
