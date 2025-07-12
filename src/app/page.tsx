@@ -1,6 +1,7 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useRef, useEffect } from 'react';
+import { GoogleGenerativeAI } from '@google/generative-ai';
 import { 
   BookOpen, 
   Zap, 
@@ -13,11 +14,13 @@ import {
   ArrowLeft,
   XCircle,
   CheckCircle,
-  Mic,
-  Settings,
   Star,
   Users,
-  Crown
+  Crown,
+  Mic,
+  MicOff,
+  Volume2,
+  VolumeX
 } from 'lucide-react';
 
 // Types
@@ -74,9 +77,6 @@ interface LeaderboardEntry {
 
 export default function ANKIDApp() {
   const [currentSection, setCurrentSection] = useState('dashboard');
-  const [currentCardIndex, setCurrentCardIndex] = useState(0);
-  const [showAnswer, setShowAnswer] = useState(false);
-  const [isStudying, setIsStudying] = useState(false);
   const [newCard, setNewCard] = useState<{ front: string; back: string; subject: string; difficulty: 'Easy' | 'Medium' | 'Hard' }>({ 
     front: '', 
     back: '', 
@@ -94,6 +94,75 @@ export default function ANKIDApp() {
     gems: 35,
     coins: 250
   });
+
+  // AI Chat state
+  const [chatMessages, setChatMessages] = useState<{ role: 'user' | 'assistant'; content: string; timestamp: Date }[]>([
+    {
+      role: 'assistant',
+      content: 'Hello! I\'m your AI tutor. I\'m here to help you learn anything you\'d like. What would you like to study today?',
+      timestamp: new Date()
+    }
+  ]);
+  const [currentMessage, setCurrentMessage] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
+  const [isListening, setIsListening] = useState(false);
+  const [isSpeaking, setIsSpeaking] = useState(false);
+  const chatContainerRef = useRef<HTMLDivElement>(null);
+  const recognitionRef = useRef<any>(null);
+  const speechSynthesisRef = useRef<SpeechSynthesis | null>(null);
+
+  // Auto-scroll chat to bottom when new messages are added
+  useEffect(() => {
+    if (chatContainerRef.current) {
+      chatContainerRef.current.scrollTop = chatContainerRef.current.scrollHeight;
+    }
+  }, [chatMessages, isLoading]);
+
+  // Initialize speech recognition and synthesis
+  useEffect(() => {
+    // Initialize Speech Recognition
+    if (typeof window !== 'undefined' && ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window)) {
+      const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
+      recognitionRef.current = new SpeechRecognition();
+      recognitionRef.current.continuous = false;
+      recognitionRef.current.interimResults = false;
+      recognitionRef.current.lang = 'en-US';
+
+      recognitionRef.current.onstart = () => {
+        setIsListening(true);
+      };
+
+      recognitionRef.current.onend = () => {
+        setIsListening(false);
+      };
+
+      recognitionRef.current.onresult = (event: any) => {
+        const transcript = event.results[0][0].transcript;
+        setCurrentMessage(transcript);
+        setIsListening(false);
+      };
+
+      recognitionRef.current.onerror = (event: any) => {
+        console.error('Speech recognition error:', event.error);
+        setIsListening(false);
+      };
+    }
+
+    // Initialize Speech Synthesis
+    if (typeof window !== 'undefined' && 'speechSynthesis' in window) {
+      speechSynthesisRef.current = window.speechSynthesis;
+    }
+
+    // Cleanup
+    return () => {
+      if (recognitionRef.current) {
+        recognitionRef.current.stop();
+      }
+      if (speechSynthesisRef.current) {
+        speechSynthesisRef.current.cancel();
+      }
+    };
+  }, []);
 
   const [flashcards, setFlashcards] = useState<Flashcard[]>([
     { id: 1, front: 'What is photosynthesis?', back: 'The process by which plants convert sunlight into energy', subject: 'Biology', difficulty: 'Easy', mastered: true },
@@ -127,50 +196,6 @@ export default function ANKIDApp() {
 
   const showSection = (section: string) => {
     setCurrentSection(section);
-  };
-
-  const startStudySession = () => {
-    setIsStudying(true);
-    setCurrentCardIndex(0);
-    setShowAnswer(false);
-  };
-
-  const endStudySession = () => {
-    setIsStudying(false);
-    setShowAnswer(false);
-  };
-
-  const nextCard = () => {
-    if (currentCardIndex < flashcards.length - 1) {
-      setCurrentCardIndex(currentCardIndex + 1);
-      setShowAnswer(false);
-    }
-  };
-
-  const prevCard = () => {
-    if (currentCardIndex > 0) {
-      setCurrentCardIndex(currentCardIndex - 1);
-      setShowAnswer(false);
-    }
-  };
-
-  const markCard = (correct: boolean) => {
-    const xpGain = correct ? 10 : 5;
-    setUserStats(prev => ({
-      ...prev,
-      xp: prev.xp + xpGain,
-      xpToNext: prev.xpToNext - xpGain
-    }));
-    
-    if (correct) {
-      setFlashcards(prev => prev.map(card => 
-        card.id === flashcards[currentCardIndex].id 
-          ? { ...card, mastered: true }
-          : card
-      ));
-    }
-    
-    nextCard();
   };
 
   const addNewCard = () => {
@@ -302,145 +327,253 @@ export default function ANKIDApp() {
     </div>
   );
 
-  const renderStudy = () => {
-    if (isStudying && flashcards.length > 0) {
-      const currentCard = flashcards[currentCardIndex];
-      return (
-        <div className="max-w-2xl mx-auto">
-          <div className="flex items-center justify-between mb-6">
-            <button onClick={endStudySession} className="ankid-button-secondary flex items-center space-x-2">
-              <ArrowLeft size={20} />
-              <span>End Session</span>
-            </button>
-            <div className="ankid-badge">
-              Card {currentCardIndex + 1} of {flashcards.length}
+  const renderAIChat = () => {
+    const startListening = () => {
+      if (recognitionRef.current && !isListening) {
+        recognitionRef.current.start();
+      }
+    };
+
+    const stopListening = () => {
+      if (recognitionRef.current && isListening) {
+        recognitionRef.current.stop();
+      }
+    };
+
+    const speakText = (text: string) => {
+      if (speechSynthesisRef.current && !isSpeaking) {
+        // Cancel any ongoing speech
+        speechSynthesisRef.current.cancel();
+        
+        const utterance = new SpeechSynthesisUtterance(text);
+        utterance.rate = 0.9;
+        utterance.pitch = 1;
+        utterance.volume = 1;
+        
+        utterance.onstart = () => setIsSpeaking(true);
+        utterance.onend = () => setIsSpeaking(false);
+        utterance.onerror = () => setIsSpeaking(false);
+        
+        speechSynthesisRef.current.speak(utterance);
+      }
+    };
+
+    const stopSpeaking = () => {
+      if (speechSynthesisRef.current && isSpeaking) {
+        speechSynthesisRef.current.cancel();
+        setIsSpeaking(false);
+      }
+    };
+
+    const sendMessage = async () => {
+      if (!currentMessage.trim()) return;
+      
+      const userMessage = { role: 'user' as const, content: currentMessage, timestamp: new Date() };
+      const messageToSend = currentMessage;
+      setChatMessages(prev => [...prev, userMessage]);
+      setCurrentMessage('');
+      setIsLoading(true);
+      
+      try {
+        // Initialize Gemini AI
+        const apiKey = process.env.NEXT_PUBLIC_GEMINI_API_KEY;
+        
+        if (!apiKey || apiKey === 'your_gemini_api_key_here') {
+          throw new Error('Please set your Gemini API key in .env.local');
+        }
+        
+        const genAI = new GoogleGenerativeAI(apiKey);
+        const model = genAI.getGenerativeModel({ model: 'gemini-2.5-flash' });
+        
+        // Create educational context for better responses
+        const prompt = `You are an AI tutor helping students learn. Please provide a clear, educational, and engaging response to this question: "${messageToSend}". 
+
+If the question is about a specific subject, explain concepts step by step. If it's a general question, provide helpful learning guidance. Keep your response informative but concise (2-3 paragraphs max). Since this will be spoken aloud, use natural conversational language.`;
+        
+        const result = await model.generateContent(prompt);
+        const response = await result.response;
+        const aiResponseText = response.text();
+        
+        const aiResponse = {
+          role: 'assistant' as const,
+          content: aiResponseText,
+          timestamp: new Date()
+        };
+        
+        setChatMessages(prev => [...prev, aiResponse]);
+        
+        // Automatically speak the AI response
+        setTimeout(() => {
+          speakText(aiResponseText);
+        }, 500);
+        
+      } catch (error) {
+        console.error('Error calling Gemini API:', error);
+        
+        const errorResponse = {
+          role: 'assistant' as const,
+          content: `I'm sorry, I encountered an error. ${error instanceof Error ? error.message : 'Please make sure your Gemini API key is set correctly in .env.local file.'} 
+
+You can get a free API key from: https://aistudio.google.com/app/apikey
+
+For now, here's a helpful response: I'd be happy to help you learn about "${messageToSend}". Please try again once your API key is configured!`,
+          timestamp: new Date()
+        };
+        
+        setChatMessages(prev => [...prev, errorResponse]);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    return (
+      <div className="max-w-4xl mx-auto h-[calc(100vh-200px)] flex flex-col">
+        <div className="ankid-paper p-6 mb-6">
+          <h2 className="ankid-section-title">AI Tutor - Speech Mode</h2>
+          <p className="ankid-section-subtitle">Speak to learn! Ask me anything with your voice.</p>
+          
+          {/* Speech Status Indicators */}
+          <div className="flex items-center justify-center space-x-4 mt-4">
+            <div className={`flex items-center space-x-2 px-3 py-1 rounded-full ${
+              isListening ? 'bg-red-100 text-red-700' : 'bg-gray-100 text-gray-600'
+            }`}>
+              {isListening ? <Mic size={16} /> : <MicOff size={16} />}
+              <span className="text-sm">{isListening ? 'Listening...' : 'Ready to listen'}</span>
+            </div>
+            
+            <div className={`flex items-center space-x-2 px-3 py-1 rounded-full ${
+              isSpeaking ? 'bg-blue-100 text-blue-700' : 'bg-gray-100 text-gray-600'
+            }`}>
+              {isSpeaking ? <Volume2 size={16} /> : <VolumeX size={16} />}
+              <span className="text-sm">{isSpeaking ? 'Speaking...' : 'Ready to speak'}</span>
             </div>
           </div>
+        </div>
 
-          <div className="ankid-paper p-8 text-center">
-            <div className="mb-6">
-              <div className="ankid-badge mb-4" style={{background: 'var(--md3-secondary-container)'}}>
-                {currentCard.subject} • {currentCard.difficulty}
+        {/* Chat Messages */}
+        <div 
+          ref={chatContainerRef}
+          className="flex-1 ankid-paper p-6 mb-4 overflow-y-auto"
+        >
+          <div className="space-y-4">
+            {chatMessages.map((message, index) => (
+              <div key={index} className={`flex ${message.role === 'user' ? 'justify-end' : 'justify-start'}`}>
+                <div
+                  className={`max-w-[80%] p-4 rounded-2xl ${
+                    message.role === 'user'
+                      ? 'ml-4'
+                      : 'mr-4'
+                  }`}
+                  style={{
+                    background: message.role === 'user' ? 'var(--md3-primary)' : 'var(--md3-secondary-container)',
+                    color: message.role === 'user' ? 'var(--md3-on-primary)' : 'var(--md3-on-secondary-container)'
+                  }}
+                >
+                  <div className="flex items-start justify-between">
+                    <p className="mb-2 whitespace-pre-wrap flex-1">{message.content}</p>
+                    {message.role === 'assistant' && (
+                      <button
+                        onClick={() => speakText(message.content)}
+                        disabled={isSpeaking}
+                        className="ml-2 p-1 rounded opacity-70 hover:opacity-100 transition-opacity"
+                        title="Speak this message"
+                      >
+                        {isSpeaking ? <Volume2 size={16} /> : <Volume2 size={16} />}
+                      </button>
+                    )}
+                  </div>
+                  <p className="text-xs opacity-70">
+                    {message.timestamp.toLocaleTimeString()}
+                  </p>
+                </div>
               </div>
-              <h2 className="ankid-section-title text-2xl mb-4">
-                {showAnswer ? 'Answer' : 'Question'}
-              </h2>
-              <p className="text-xl" style={{color: 'var(--md3-on-surface)'}}>
-                {showAnswer ? currentCard.back : currentCard.front}
-              </p>
-            </div>
-
-            {!showAnswer ? (
-              <button onClick={() => setShowAnswer(true)} className="ankid-button">
-                Show Answer
-              </button>
-            ) : (
-              <div className="space-y-4">
-                <p className="text-sm" style={{color: 'var(--md3-on-surface-variant)'}}>
-                  How well did you know this?
-                </p>
-                <div className="flex justify-center space-x-4">
-                  <button onClick={() => markCard(false)} className="ankid-button-secondary flex items-center space-x-2">
-                    <XCircle size={20} />
-                    <span>Didn't Know</span>
-                  </button>
-                  <button onClick={() => markCard(true)} className="ankid-button flex items-center space-x-2">
-                    <CheckCircle size={20} />
-                    <span>Got It!</span>
-                  </button>
+            ))}
+            
+            {isLoading && (
+              <div className="flex justify-start">
+                <div className="mr-4 p-4 rounded-2xl" style={{background: 'var(--md3-secondary-container)'}}>
+                  <div className="flex space-x-1">
+                    <div className="w-2 h-2 bg-current rounded-full animate-bounce"></div>
+                    <div className="w-2 h-2 bg-current rounded-full animate-bounce" style={{animationDelay: '0.1s'}}></div>
+                    <div className="w-2 h-2 bg-current rounded-full animate-bounce" style={{animationDelay: '0.2s'}}></div>
+                  </div>
                 </div>
               </div>
             )}
-
-            <div className="flex justify-between mt-8 pt-4 border-t" style={{borderColor: 'var(--md3-outline-variant)'}}>
-              <button 
-                onClick={prevCard} 
-                disabled={currentCardIndex === 0}
-                className="ankid-button-secondary disabled:opacity-50"
-              >
-                Previous
-              </button>
-              <button 
-                onClick={nextCard} 
-                disabled={currentCardIndex === flashcards.length - 1}
-                className="ankid-button-secondary disabled:opacity-50"
-              >
-                Next
-              </button>
-            </div>
           </div>
         </div>
-      );
-    }
 
-    return (
-      <div className="max-w-4xl mx-auto">
-        <div className="ankid-paper p-8 text-center mb-8">
-          <h2 className="ankid-section-title">Study Session</h2>
-          <p className="ankid-section-subtitle">Choose your study method</p>
-          
-          <div className="grid md:grid-cols-2 gap-6 mt-8">
-            <div className="ankid-card">
-              <div className="text-center">
-                <div className="w-16 h-16 mx-auto mb-4 rounded-full flex items-center justify-center"
-                     style={{background: 'var(--md3-primary)'}}>
-                  <BookOpen size={32} color="white" />
-                </div>
-                <h3 className="font-semibold mb-2">Flashcard Review</h3>
-                <p className="text-sm mb-4" style={{color: 'var(--md3-on-surface-variant)'}}>
-                  Traditional flashcard study with spaced repetition
-                </p>
-                <button onClick={startStudySession} className="ankid-button w-full">
-                  Start Review ({flashcards.length} cards)
-                </button>
-              </div>
-            </div>
+        {/* Speech Input Controls */}
+        <div className="ankid-paper p-4">
+          <div className="flex space-x-4">
+            <input
+              type="text"
+              value={currentMessage}
+              onChange={(e) => setCurrentMessage(e.target.value)}
+              onKeyPress={(e) => e.key === 'Enter' && !isLoading && sendMessage()}
+              placeholder="Speak or type your question..."
+              className="flex-1 ankid-input"
+              disabled={isLoading || isListening}
+            />
             
-            <div className="ankid-card">
-              <div className="text-center">
-                <div className="w-16 h-16 mx-auto mb-4 rounded-full flex items-center justify-center"
-                     style={{background: 'var(--md3-secondary)'}}>
-                  <Zap size={32} color="black" />
-                </div>
-                <h3 className="font-semibold mb-2">Quick Quiz</h3>
-                <p className="text-sm mb-4" style={{color: 'var(--md3-on-surface-variant)'}}>
-                  Fast-paced quiz mode for rapid learning
-                </p>
-                <button className="ankid-button-secondary w-full">
-                  Coming Soon
-                </button>
-              </div>
-            </div>
+            {/* Voice Input Button */}
+            <button
+              onClick={isListening ? stopListening : startListening}
+              disabled={isLoading || isSpeaking}
+              className={`px-4 py-2 rounded-lg font-medium transition-colors ${
+                isListening 
+                  ? 'bg-red-500 text-white hover:bg-red-600' 
+                  : 'ankid-button-secondary'
+              }`}
+              title={isListening ? 'Stop listening' : 'Start voice input'}
+            >
+              {isListening ? <MicOff size={20} /> : <Mic size={20} />}
+            </button>
+            
+            {/* Stop Speaking Button */}
+            {isSpeaking && (
+              <button
+                onClick={stopSpeaking}
+                className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors"
+                title="Stop speaking"
+              >
+                <VolumeX size={20} />
+              </button>
+            )}
+            
+            {/* Send Button */}
+            <button
+              onClick={sendMessage}
+              disabled={isLoading || !currentMessage.trim() || isListening}
+              className="ankid-button disabled:opacity-50"
+            >
+              Send
+            </button>
           </div>
-        </div>
-
-        <div className="ankid-paper p-8">
-          <h3 className="ankid-section-title">Study Statistics</h3>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-6 mt-6">
-            <div className="text-center">
-              <div className="text-2xl font-bold mb-1" style={{color: 'var(--md3-primary)'}}>
-                {userStats.totalCards}
-              </div>
-              <p className="text-sm" style={{color: 'var(--md3-on-surface-variant)'}}>Total Cards</p>
-            </div>
-            <div className="text-center">
-              <div className="text-2xl font-bold mb-1" style={{color: 'var(--md3-secondary)'}}>
-                {userStats.masteredCards}
-              </div>
-              <p className="text-sm" style={{color: 'var(--md3-on-surface-variant)'}}>Mastered</p>
-            </div>
-            <div className="text-center">
-              <div className="text-2xl font-bold mb-1" style={{color: 'var(--md3-tertiary)'}}>
-                {Math.round((userStats.masteredCards / userStats.totalCards) * 100)}%
-              </div>
-              <p className="text-sm" style={{color: 'var(--md3-on-surface-variant)'}}>Accuracy</p>
-            </div>
-            <div className="text-center">
-              <div className="text-2xl font-bold mb-1" style={{color: 'var(--md3-primary)'}}>
-                {userStats.streak}
-              </div>
-              <p className="text-sm" style={{color: 'var(--md3-on-surface-variant)'}}>Day Streak</p>
-            </div>
+          
+          <div className="mt-4 flex flex-wrap gap-2">
+            <span className="text-sm" style={{color: 'var(--md3-on-surface-variant)'}}>Quick topics (click to speak):</span>
+            {['Math help', 'Science concepts', 'History facts', 'Language learning', 'Study tips'].map((topic) => (
+              <button
+                key={topic}
+                onClick={() => {
+                  setCurrentMessage(topic);
+                  setTimeout(() => sendMessage(), 100);
+                }}
+                className="ankid-badge cursor-pointer hover:opacity-80 transition-opacity"
+                style={{background: 'var(--md3-tertiary-container)', color: 'var(--md3-on-tertiary-container)'}}
+              >
+                {topic}
+              </button>
+            ))}
+          </div>
+          
+          {/* Instructions */}
+          <div className="mt-4 p-3 rounded-lg" style={{background: 'var(--md3-surface-container)', color: 'var(--md3-on-surface-variant)'}}>
+            <p className="text-sm">
+              🎤 <strong>Speech Mode:</strong> Click the microphone to speak your question, or type normally. 
+              AI responses will be spoken automatically. Click the speaker icon on any message to hear it again.
+            </p>
           </div>
         </div>
       </div>
@@ -730,88 +863,12 @@ export default function ANKIDApp() {
     </div>
   );
 
-  const renderAvatar = () => (
-    <div className="max-w-4xl mx-auto">
-      <div className="ankid-paper p-8 mb-8 text-center">
-        <h2 className="ankid-section-title">Avatar Customization</h2>
-        <p className="ankid-section-subtitle">Personalize your learning companion</p>
-      </div>
-
-      <div className="grid md:grid-cols-2 gap-8">
-        <div className="ankid-paper p-8 text-center">
-          <h3 className="ankid-section-title mb-6">Your Avatar</h3>
-          <div className="w-32 h-32 mx-auto mb-6 rounded-full flex items-center justify-center text-6xl"
-               style={{background: 'var(--md3-primary-container)'}}>
-            🎓
-          </div>
-          <div className="space-y-2">
-            <h4 className="font-semibold" style={{color: 'var(--md3-on-surface)'}}>Study Scholar</h4>
-            <p className="text-sm" style={{color: 'var(--md3-on-surface-variant)'}}>Level {userStats.level} Learner</p>
-            <div className="ankid-badge">🔥 {userStats.streak} Day Streak</div>
-          </div>
-        </div>
-
-        <div className="ankid-paper p-8">
-          <h3 className="ankid-section-title mb-6">Customization</h3>
-          
-          <div className="space-y-6">
-            <div>
-              <h4 className="font-semibold mb-3" style={{color: 'var(--md3-on-surface)'}}>Avatar Style</h4>
-              <div className="grid grid-cols-4 gap-3">
-                {['🎓', '🤓', '🧠', '📚', '✨', '🏆', '🔥', '⭐'].map((emoji, index) => (
-                  <button key={index} className="w-12 h-12 rounded-lg border-2 flex items-center justify-center text-2xl hover:border-blue-500 transition-colors"
-                          style={{borderColor: 'var(--md3-outline-variant)'}}>
-                    {emoji}
-                  </button>
-                ))}
-              </div>
-            </div>
-
-            <div>
-              <h4 className="font-semibold mb-3" style={{color: 'var(--md3-on-surface)'}}>Background</h4>
-              <div className="grid grid-cols-4 gap-3">
-                {['#1a237e', '#f8bbd9', '#e1bee7', '#72777b'].map((color, index) => (
-                  <button key={index} className="w-12 h-12 rounded-lg border-2"
-                          style={{background: color, borderColor: 'var(--md3-outline-variant)'}} />
-                ))}
-              </div>
-            </div>
-
-            <div>
-              <h4 className="font-semibold mb-3" style={{color: 'var(--md3-on-surface)'}}>Achievements</h4>
-              <div className="grid grid-cols-3 gap-3">
-                {[
-                  { icon: '🏆', name: 'First Steps', unlocked: true },
-                  { icon: '🔥', name: 'Streak Master', unlocked: true },
-                  { icon: '📚', name: 'Bookworm', unlocked: false },
-                  { icon: '🎯', name: 'Perfectionist', unlocked: false },
-                  { icon: '⚡', name: 'Speed Learner', unlocked: false },
-                  { icon: '👑', name: 'Legend', unlocked: false }
-                ].map((achievement, index) => (
-                  <div key={index} className={`p-3 rounded-lg border text-center ${
-                    achievement.unlocked ? 'border-yellow-300' : 'border-gray-300'
-                  }`} style={{
-                    background: achievement.unlocked ? 'var(--md3-secondary-container)' : 'var(--md3-surface-variant)',
-                    opacity: achievement.unlocked ? 1 : 0.5
-                  }}>
-                    <div className="text-2xl mb-1">{achievement.icon}</div>
-                    <p className="text-xs font-medium">{achievement.name}</p>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  );
-
   const renderCurrentSection = () => {
     switch(currentSection) {
       case 'dashboard':
         return renderDashboard();
-      case 'study':
-        return renderStudy();
+      case 'ai-chat':
+        return renderAIChat();
       case 'collection':
         return renderCollection();
       case 'marketplace':
@@ -820,8 +877,6 @@ export default function ANKIDApp() {
         return renderQuests();
       case 'leaderboard':
         return renderLeaderboard();
-      case 'avatar':
-        return renderAvatar();
       default:
         return <div className="text-center p-8">
           <h3 className="ankid-section-title">{currentSection.charAt(0).toUpperCase() + currentSection.slice(1)}</h3>
@@ -833,7 +888,7 @@ export default function ANKIDApp() {
   return (
     <div className="min-h-screen" style={{background: 'var(--md3-background)'}}>
       {/* Header */}
-      <div className="border-b-2" style={{borderColor: 'var(--md3-outline-variant)'}}>
+      <div className="border-b" style={{borderColor: 'var(--md3-outline-variant)'}}>
         <div className="max-w-5xl mx-auto px-8">
           <div className="flex items-center justify-between py-4">
             <div className="flex items-center space-x-6">
@@ -855,22 +910,6 @@ export default function ANKIDApp() {
                   💎 {userStats.gems}
                 </div>
               </div>
-              <button className="p-3 rounded-full border-2 transition-all duration-200"
-                      style={{
-                        background: 'var(--md3-surface-variant)',
-                        borderColor: 'var(--md3-outline-variant)',
-                        color: 'var(--md3-on-surface-variant)'
-                      }}>
-                <Mic size={20} />
-              </button>
-              <button className="p-3 rounded-full border-2 transition-all duration-200"
-                      style={{
-                        background: 'var(--md3-surface-variant)',
-                        borderColor: 'var(--md3-outline-variant)',
-                        color: 'var(--md3-on-surface-variant)'
-                      }}>
-                <Settings size={20} />
-              </button>
             </div>
           </div>
           
@@ -878,12 +917,11 @@ export default function ANKIDApp() {
           <div className="flex space-x-2 pb-4">
             {[
               { id: 'dashboard', label: 'Dashboard' },
-              { id: 'study', label: 'Study' },
+              { id: 'ai-chat', label: 'AI Tutor' },
               { id: 'collection', label: 'Collection' },
               { id: 'marketplace', label: 'Marketplace' },
               { id: 'quests', label: 'Quests' },
-              { id: 'leaderboard', label: 'Leaderboard' },
-              { id: 'avatar', label: 'Avatar' }
+              { id: 'leaderboard', label: 'Leaderboard' }
             ].map(nav => (
               <button 
                 key={nav.id}
