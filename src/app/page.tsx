@@ -77,12 +77,6 @@ interface LeaderboardEntry {
 
 export default function ANKIDApp() {
   const [currentSection, setCurrentSection] = useState('dashboard');
-  const [newCard, setNewCard] = useState<{ front: string; back: string; subject: string; difficulty: 'Easy' | 'Medium' | 'Hard' }>({ 
-    front: '', 
-    back: '', 
-    subject: '', 
-    difficulty: 'Easy' 
-  });
   
   const [userStats, setUserStats] = useState<UserStats>({
     level: 1,
@@ -307,7 +301,7 @@ export default function ANKIDApp() {
   const [quests] = useState<Quest[]>([
     { id: 1, title: 'Study Master', description: 'Study 20 cards today', reward: 50, completed: false, type: 'daily', progress: 15, target: 20 },
     { id: 2, title: 'Streak Keeper', description: 'Maintain a 7-day streak', reward: 100, completed: false, type: 'weekly', progress: 5, target: 7 },
-    { id: 3, title: 'Collection Builder', description: 'Create 5 new cards', reward: 25, completed: true, type: 'daily', progress: 5, target: 5 },
+    { id: 3, title: 'Knowledge Explorer', description: 'Complete 5 learning conversations', reward: 25, completed: true, type: 'daily', progress: 5, target: 5 },
     { id: 4, title: 'Knowledge Seeker', description: 'Master 10 cards', reward: 75, completed: false, type: 'weekly', progress: 8, target: 10 }
   ]);
 
@@ -408,19 +402,6 @@ export default function ANKIDApp() {
     setCurrentSection(section);
   };
 
-  const addNewCard = () => {
-    if (newCard.front && newCard.back && newCard.subject) {
-      const card: Flashcard = {
-        id: flashcards.length + 1,
-        ...newCard,
-        mastered: false
-      };
-      setFlashcards(prev => [...prev, card]);
-      setUserStats(prev => ({ ...prev, totalCards: prev.totalCards + 1 }));
-      setNewCard({ front: '', back: '', subject: '', difficulty: 'Easy' });
-    }
-  };
-
   const renderDashboard = () => (
     <div className="space-y-8">
       <div className="ankid-paper p-8">
@@ -516,15 +497,15 @@ export default function ANKIDApp() {
             </div>
             <div className="flex-1">
               <h3 className="font-bold text-lg" style={{color: 'var(--md3-on-surface)'}}>
-                Create Cards <span className="fun-emoji">✨</span>
+                Review Collection <span className="fun-emoji">📚</span>
               </h3>
               <p className="text-sm font-medium" style={{color: 'var(--md3-on-surface-variant)'}}>
-                Add new knowledge to your collection! <span className="fun-emoji">📝</span>
+                Browse your knowledge collection! <span className="fun-emoji">�</span>
               </p>
             </div>
           </div>
           <button onClick={() => showSection('collection')} className="ankid-button-secondary w-full mt-4">
-            <span className="fun-emoji">🎨</span> Create New <span className="fun-emoji">💫</span>
+            <span className="fun-emoji">👀</span> View Collection <span className="fun-emoji">✨</span>
           </button>
         </div>
       </div>
@@ -1363,98 +1344,26 @@ WRITING STYLE:
 
   const renderCollection = () => (
     <div className="max-w-6xl mx-auto">
-      <div className="ankid-paper p-8 mb-8">
-        <h2 className="ankid-section-title">Create New Card</h2>
-        <div className="grid md:grid-cols-2 gap-6 mt-6">
-          <div>
-            <label className="block text-sm font-medium mb-2" style={{color: 'var(--md3-on-surface)'}}>
-              Front (Question)
-            </label>
-            <textarea
-              value={newCard.front}
-              onChange={(e) => setNewCard(prev => ({ ...prev, front: e.target.value }))}
-              className="w-full p-3 border rounded-lg"
-              style={{
-                background: 'var(--md3-surface-variant)',
-                borderColor: 'var(--md3-outline-variant)',
-                color: 'var(--md3-on-surface)'
-              }}
-              rows={3}
-              placeholder="Enter your question here..."
-            />
-          </div>
-          <div>
-            <label className="block text-sm font-medium mb-2" style={{color: 'var(--md3-on-surface)'}}>
-              Back (Answer)
-            </label>
-            <textarea
-              value={newCard.back}
-              onChange={(e) => setNewCard(prev => ({ ...prev, back: e.target.value }))}
-              className="w-full p-3 border rounded-lg"
-              style={{
-                background: 'var(--md3-surface-variant)',
-                borderColor: 'var(--md3-outline-variant)',
-                color: 'var(--md3-on-surface)'
-              }}
-              rows={3}
-              placeholder="Enter your answer here..."
-            />
-          </div>
-          <div>
-            <label className="block text-sm font-medium mb-2" style={{color: 'var(--md3-on-surface)'}}>
-              Subject
-            </label>
-            <input
-              type="text"
-              value={newCard.subject}
-              onChange={(e) => setNewCard(prev => ({ ...prev, subject: e.target.value }))}
-              className="w-full p-3 border rounded-lg"
-              style={{
-                background: 'var(--md3-surface-variant)',
-                borderColor: 'var(--md3-outline-variant)',
-                color: 'var(--md3-on-surface)'
-              }}
-              placeholder="e.g., Biology, Math, History"
-            />
-          </div>
-          <div>
-            <label className="block text-sm font-medium mb-2" style={{color: 'var(--md3-on-surface)'}}>
-              Difficulty
-            </label>
-            <select
-              value={newCard.difficulty}
-              onChange={(e) => setNewCard(prev => ({ ...prev, difficulty: e.target.value as 'Easy' | 'Medium' | 'Hard' }))}
-              className="w-full p-3 border rounded-lg"
-              style={{
-                background: 'var(--md3-surface-variant)',
-                borderColor: 'var(--md3-outline-variant)',
-                color: 'var(--md3-on-surface)'
-              }}
-            >
-              <option value="Easy">Easy</option>
-              <option value="Medium">Medium</option>
-              <option value="Hard">Hard</option>
-            </select>
-          </div>
-        </div>
-        <button onClick={addNewCard} className="ankid-button mt-6">
-          Create Card
-        </button>
-      </div>
-
       <div className="ankid-paper p-8">
-        <h3 className="ankid-section-title">Your Collection</h3>
+        <h2 className="ankid-section-title">
+          <span className="fun-emoji">📚</span> Your Collection <span className="fun-emoji">✨</span>
+        </h2>
+        <p className="ankid-section-subtitle">
+          Browse and review your flashcard collection <span className="fun-emoji">🔍</span>
+        </p>
+        
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4 mt-6">
           {flashcards.map(card => (
             <div key={card.id} className="ankid-card">
-              <div className="flex justify-between items-start mb-3">              <div className="ankid-badge" style={{
-                background: card.difficulty === 'Easy' ? 'var(--md3-secondary-container)' : 
-                           card.difficulty === 'Medium' ? 'var(--md3-tertiary-container)' : 
-                           'var(--md3-primary-container)',
-                color: card.difficulty === 'Easy' ? 'var(--md3-on-secondary-container)' : 
-                       card.difficulty === 'Medium' ? 'var(--md3-on-tertiary-container)' : 
-                       'var(--md3-on-primary-container)'
-              }}>
+              <div className="flex justify-between items-start mb-3">
+                <div className="ankid-badge" style={{
+                  background: card.difficulty === 'Easy' ? 'var(--md3-secondary-container)' : 
+                             card.difficulty === 'Medium' ? 'var(--md3-tertiary-container)' : 
+                             'var(--md3-primary-container)',
+                  color: card.difficulty === 'Easy' ? 'var(--md3-on-secondary-container)' : 
+                         card.difficulty === 'Medium' ? 'var(--md3-on-tertiary-container)' : 
+                         'var(--md3-on-primary-container)'
+                }}>
                   {card.subject}
                 </div>
                 {card.mastered && <Star size={16} style={{color: 'var(--md3-secondary)'}} fill="currentColor" />}
@@ -1468,12 +1377,22 @@ WRITING STYLE:
               <div className="flex justify-between items-center mt-4">
                 <span className="ankid-badge">{card.difficulty}</span>
                 <span className="text-xs" style={{color: card.mastered ? 'var(--md3-secondary)' : 'var(--md3-on-surface-variant)'}}>
-                  {card.mastered ? 'Mastered' : 'Learning'}
+                  {card.mastered ? 'Mastered ⭐' : 'Learning 📖'}
                 </span>
               </div>
             </div>
           ))}
         </div>
+        
+        {flashcards.length === 0 && (
+          <div className="text-center py-12">
+            <div className="fun-emoji text-6xl mb-4">📝</div>
+            <h3 className="ankid-section-title mb-2">No Cards Yet</h3>
+            <p className="ankid-section-subtitle">
+              Your collection is empty. Use the Teaching Assistant to learn and create cards through conversation! <span className="fun-emoji">🎓</span>
+            </p>
+          </div>
+        )}
       </div>
     </div>
   );

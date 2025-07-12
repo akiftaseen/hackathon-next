@@ -19,7 +19,7 @@ export default function RootLayout({
           rel="stylesheet"
         />
       </head>
-      <body style={{ fontFamily: "'Feather', 'Fredoka', sans-serif", fontWeight: "700" }}>
+      <body style={{ fontFamily: "'Feather', 'Fredoka', sans-serif", fontWeight: "700", fontSize: "1.25rem" }}>
         {children}
       </body>
     </html>

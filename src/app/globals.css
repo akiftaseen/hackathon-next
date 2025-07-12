@@ -1,9 +1,16 @@
 @import "tailwindcss";
 
-/* Apply Feather Bold globally with Fredoka as fallback for fun UI */
+/* Apply Feather Bold globally with Fredoka as fallback for fun UI - MUCH BIGGER */
 body {
   font-family: 'Feather', 'Fredoka', sans-serif;
   font-weight: 700;
+  font-size: 1.25rem; /* Increased from default */
+  line-height: 1.6;
+}
+
+/* Scale up all text elements */
+html {
+  font-size: 20px; /* Increased base font size from 16px to 20px */
 }
 
 /* Fun animations */
@@ -52,11 +59,11 @@ body {
 .animate-float { animation: float 3s ease-in-out infinite; }
 .animate-shimmer { animation: shimmer 2s infinite; }
 
-/* Fun emoji styling */
+/* Fun emoji styling - Much Bigger */
 .fun-emoji {
   display: inline-block;
-  font-size: 1.2em;
-  margin: 0 2px;
+  font-size: 1.8em; /* Increased from 1.2em */
+  margin: 0 4px; /* Increased from 0 2px */
   filter: drop-shadow(0 2px 4px rgba(0,0,0,0.1));
 }
 
@@ -112,38 +119,39 @@ body {
 .ankid-header {
   background: linear-gradient(135deg, var(--md3-primary) 0%, var(--md3-secondary) 50%, var(--md3-tertiary) 100%);
   color: var(--md3-on-primary);
-  padding: 1rem 2rem;
+  padding: 2rem 3rem; /* Increased padding */
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
   font-family: 'Feather', 'Fredoka', sans-serif;
   font-weight: 700;
 }
 
 .ankid-title {
-  font-size: 2rem;
+  font-size: 3.5rem; /* Increased from 2rem */
   font-weight: 700;
   text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
   font-family: 'Feather', 'Fredoka', sans-serif;
 }
 
 .ankid-subtitle {
-  font-size: 1rem;
+  font-size: 1.5rem; /* Increased from 1rem */
   opacity: 0.9;
   font-family: 'Feather', 'Fredoka', sans-serif;
 }
 
 .ankid-main {
-  padding: 2rem;
-  max-width: 1200px;
+  padding: 3rem; /* Increased from 2rem */
+  max-width: 1400px; /* Increased from 1200px */
   margin: 0 auto;
 }
 
 .ankid-paper {
   background: rgba(255, 255, 255, 0.95);
   backdrop-filter: blur(10px);
-  border-radius: 16px;
+  border-radius: 24px; /* Increased from 16px */
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
   border: 1px solid rgba(255, 255, 255, 0.2);
   transition: all 0.3s ease;
+  padding: 1.5rem; /* Added padding */
 }
 
 .ankid-paper:hover {
@@ -152,28 +160,29 @@ body {
 }
 
 .ankid-section-title {
-  font-size: 1.5rem;
+  font-size: 2.5rem; /* Increased from 1.5rem */
   font-weight: 700;
   color: var(--md3-primary);
-  margin-bottom: 0.5rem;
+  margin-bottom: 1rem; /* Increased from 0.5rem */
   font-family: 'Feather', 'Fredoka', sans-serif;
 }
 
 .ankid-section-subtitle {
   color: var(--md3-on-surface-variant);
-  margin-bottom: 1rem;
+  margin-bottom: 2rem; /* Increased from 1rem */
   font-family: 'Feather', 'Fredoka', sans-serif;
+  font-size: 1.25rem; /* Added explicit size */
 }
 
-/* Buttons */
+/* Buttons - Much Bigger */
 .ankid-button {
   background: linear-gradient(135deg, var(--md3-primary), var(--md3-secondary));
   color: var(--md3-on-primary);
   border: none;
-  border-radius: 24px;
-  padding: 12px 24px;
+  border-radius: 32px; /* Increased from 24px */
+  padding: 18px 36px; /* Increased from 12px 24px */
   font-weight: 700;
-  font-size: 1rem;
+  font-size: 1.5rem; /* Increased from 1rem */
   cursor: pointer;
   transition: all 0.3s ease;
   box-shadow: 0 4px 12px rgba(69, 191, 219, 0.3);
@@ -194,10 +203,10 @@ body {
   background: linear-gradient(135deg, var(--md3-secondary), var(--md3-tertiary));
   color: var(--md3-on-secondary);
   border: none;
-  border-radius: 24px;
-  padding: 12px 24px;
+  border-radius: 32px; /* Increased from 24px */
+  padding: 18px 36px; /* Increased from 12px 24px */
   font-weight: 700;
-  font-size: 1rem;
+  font-size: 1.5rem; /* Increased from 1rem */
   cursor: pointer;
   transition: all 0.3s ease;
   box-shadow: 0 4px 12px rgba(245, 221, 89, 0.3);
@@ -210,15 +219,16 @@ body {
   filter: brightness(1.1);
 }
 
-/* Cards */
+/* Cards - Much Bigger */
 .ankid-card {
   background: linear-gradient(135deg, rgba(255, 255, 255, 0.9), rgba(248, 250, 252, 0.9));
-  border-radius: 16px;
-  padding: 1.5rem;
+  border-radius: 24px; /* Increased from 16px */
+  padding: 2.5rem; /* Increased from 1.5rem */
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
   border: 1px solid rgba(69, 191, 219, 0.2);
   transition: all 0.3s ease;
   font-family: 'Feather', 'Fredoka', sans-serif;
+  font-size: 1.2rem; /* Added larger base font size */
 }
 
 .ankid-card:hover {
@@ -249,18 +259,18 @@ body {
   animation: shimmer 2s infinite;
 }
 
-/* Stats containers */
+/* Stats containers - Much Bigger */
 .ankid-stats {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-  gap: 1rem;
-  margin-bottom: 2rem;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); /* Increased from 200px */
+  gap: 2rem; /* Increased from 1rem */
+  margin-bottom: 3rem; /* Increased from 2rem */
 }
 
 .ankid-stat-card {
   background: linear-gradient(135deg, rgba(255, 255, 255, 0.95), rgba(69, 191, 219, 0.1));
-  border-radius: 16px;
-  padding: 1.5rem;
+  border-radius: 24px; /* Increased from 16px */
+  padding: 2.5rem; /* Increased from 1.5rem */
   text-align: center;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
   border: 2px solid transparent;
@@ -275,7 +285,7 @@ body {
 }
 
 .ankid-stat-number {
-  font-size: 2rem;
+  font-size: 3.5rem; /* Increased from 2rem */
   font-weight: 700;
   color: var(--md3-primary);
   text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
@@ -285,22 +295,23 @@ body {
 .ankid-stat-label {
   color: var(--md3-on-surface-variant);
   font-weight: 600;
-  margin-top: 0.5rem;
+  margin-top: 1rem; /* Increased from 0.5rem */
   font-family: 'Feather', 'Fredoka', sans-serif;
+  font-size: 1.25rem; /* Added explicit size */
 }
 
-/* Action grid */
+/* Action grid - Much Bigger */
 .ankid-actions {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-  gap: 1rem;
-  margin-bottom: 2rem;
+  grid-template-columns: repeat(auto-fit, minmax(350px, 1fr)); /* Increased from 250px */
+  gap: 2rem; /* Increased from 1rem */
+  margin-bottom: 3rem; /* Increased from 2rem */
 }
 
 .ankid-action-card {
   background: linear-gradient(135deg, rgba(255, 255, 255, 0.9), rgba(245, 221, 89, 0.1));
-  border-radius: 16px;
-  padding: 1.5rem;
+  border-radius: 24px; /* Increased from 16px */
+  padding: 2.5rem; /* Increased from 1.5rem */
   cursor: pointer;
   transition: all 0.3s ease;
   border: 2px solid transparent;
@@ -317,33 +328,33 @@ body {
 }
 
 .ankid-action-icon {
-  font-size: 2rem;
-  margin-bottom: 1rem;
+  font-size: 3.5rem; /* Increased from 2rem */
+  margin-bottom: 1.5rem; /* Increased from 1rem */
   color: var(--md3-secondary);
   filter: drop-shadow(2px 2px 4px rgba(0,0,0,0.2));
 }
 
 .ankid-action-title {
-  font-size: 1.2rem;
+  font-size: 1.75rem; /* Increased from 1.2rem */
   font-weight: 700;
   color: var(--md3-on-surface);
-  margin-bottom: 0.5rem;
+  margin-bottom: 1rem; /* Increased from 0.5rem */
   font-family: 'Feather', 'Fredoka', sans-serif;
 }
 
 .ankid-action-desc {
   color: var(--md3-on-surface-variant);
-  font-size: 0.9rem;
+  font-size: 1.25rem; /* Increased from 0.9rem */
   font-family: 'Feather', 'Fredoka', sans-serif;
 }
 
-/* Forms */
+/* Forms - Much Bigger */
 .ankid-input {
   width: 100%;
-  padding: 12px 16px;
+  padding: 18px 24px; /* Increased from 12px 16px */
   border: 2px solid var(--md3-outline-variant);
-  border-radius: 12px;
-  font-size: 1rem;
+  border-radius: 16px; /* Increased from 12px */
+  font-size: 1.5rem; /* Increased from 1rem */
   transition: all 0.3s ease;
   background: rgba(255, 255, 255, 0.9);
   font-family: 'Feather', 'Fredoka', sans-serif;
@@ -358,14 +369,14 @@ body {
 
 .ankid-textarea {
   width: 100%;
-  padding: 12px 16px;
+  padding: 18px 24px; /* Increased from 12px 16px */
   border: 2px solid var(--md3-outline-variant);
-  border-radius: 12px;
-  font-size: 1rem;
+  border-radius: 16px; /* Increased from 12px */
+  font-size: 1.5rem; /* Increased from 1rem */
   transition: all 0.3s ease;
   background: rgba(255, 255, 255, 0.9);
   resize: vertical;
-  min-height: 120px;
+  min-height: 160px; /* Increased from 120px */
   font-family: 'Feather', 'Fredoka', sans-serif;
 }
 
@@ -412,10 +423,14 @@ body {
   box-shadow: 0 4px 12px rgba(69, 191, 219, 0.3);
 }
 
-/* Responsive design */
+/* Responsive design - Adjusted for bigger UI */
 @media (max-width: 768px) {
+  html {
+    font-size: 18px; /* Slightly smaller on mobile but still bigger than default */
+  }
+  
   .ankid-main {
-    padding: 1rem;
+    padding: 2rem; /* Reduced on mobile */
   }
   
   .ankid-stats {
@@ -427,11 +442,20 @@ body {
   }
   
   .ankid-header {
-    padding: 1rem;
+    padding: 1.5rem; /* Reduced on mobile */
   }
   
   .ankid-title {
-    font-size: 1.5rem;
+    font-size: 2.5rem; /* Smaller on mobile but still big */
+  }
+  
+  .ankid-section-title {
+    font-size: 2rem; /* Smaller on mobile but still big */
+  }
+  
+  .ankid-button, .ankid-button-secondary {
+    padding: 16px 32px; /* Slightly smaller on mobile */
+    font-size: 1.25rem;
   }
 }
 
