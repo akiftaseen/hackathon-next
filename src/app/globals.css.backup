@@ -1,5 +1,8 @@
 @import "tailwindcss";
 
+/* Feather Bold Font from Google Fonts */
+@import url('https://fonts.googleapis.com/css2?family=Feather:wght@300;400;700&display=swap');
+
 /* Apply Feather Bold globally */
 * {
   font-family: 'Feather', sans-serif !important;

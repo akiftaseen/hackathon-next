@@ -99,7 +99,7 @@ export default function ANKIDApp() {
   const [chatMessages, setChatMessages] = useState<{ role: 'user' | 'assistant'; content: string; timestamp: Date }[]>([
     {
       role: 'assistant',
-      content: 'Hello! I\'m your AI tutor. I\'m here to help you learn anything you\'d like. What would you like to study today?',
+      content: 'Hi! I\'m your curious student friend! I love learning new things. Can you pick something you know about and help me understand it step by step? Maybe science, math, or anything you find interesting!',
       timestamp: new Date()
     }
   ]);
@@ -107,6 +107,20 @@ export default function ANKIDApp() {
   const [isLoading, setIsLoading] = useState(false);
   const [isListening, setIsListening] = useState(false);
   const [isSpeaking, setIsSpeaking] = useState(false);
+  const [interimTranscript, setInterimTranscript] = useState('');
+  const [isConversationMode, setIsConversationMode] = useState(false);
+  const [selectedVoice, setSelectedVoice] = useState<SpeechSynthesisVoice | null>(null);
+  const [availableVoices, setAvailableVoices] = useState<SpeechSynthesisVoice[]>([]);
+  const [speechSupported, setSpeechSupported] = useState(false);
+  const [isStartingListening, setIsStartingListening] = useState(false);
+  const [showRating, setShowRating] = useState(false);
+  const [conversationRating, setConversationRating] = useState<{
+    score: number;
+    feedback: string;
+    improvements: string[];
+    strengths: string[];
+  } | null>(null);
+  const [isGeneratingRating, setIsGeneratingRating] = useState(false);
   const chatContainerRef = useRef<HTMLDivElement>(null);
   const recognitionRef = useRef<any>(null);
   const speechSynthesisRef = useRef<SpeechSynthesis | null>(null);
@@ -114,7 +128,15 @@ export default function ANKIDApp() {
   // Auto-scroll chat to bottom when new messages are added
   useEffect(() => {
     if (chatContainerRef.current) {
-      chatContainerRef.current.scrollTop = chatContainerRef.current.scrollHeight;
+      const container = chatContainerRef.current;
+      // Only auto-scroll if user is near the bottom (within 100px)
+      const isNearBottom = container.scrollTop + container.clientHeight >= container.scrollHeight - 100;
+      
+      if (isNearBottom) {
+        setTimeout(() => {
+          container.scrollTop = container.scrollHeight;
+        }, 100);
+      }
     }
   }, [chatMessages, isLoading]);
 
@@ -122,35 +144,145 @@ export default function ANKIDApp() {
   useEffect(() => {
     // Initialize Speech Recognition
     if (typeof window !== 'undefined' && ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window)) {
-      const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
-      recognitionRef.current = new SpeechRecognition();
-      recognitionRef.current.continuous = false;
-      recognitionRef.current.interimResults = false;
-      recognitionRef.current.lang = 'en-US';
+      try {
+        const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
+        recognitionRef.current = new SpeechRecognition();
+        recognitionRef.current.continuous = true;  // Keep listening
+        recognitionRef.current.interimResults = true;  // Show interim results
+        recognitionRef.current.lang = 'en-US';
+        recognitionRef.current.maxAlternatives = 1;
 
-      recognitionRef.current.onstart = () => {
-        setIsListening(true);
-      };
+        recognitionRef.current.onstart = () => {
+          console.log('Speech recognition started');
+          setIsListening(true);
+          setIsStartingListening(false); // Reset starting flag
+        };
 
-      recognitionRef.current.onend = () => {
-        setIsListening(false);
-      };
+        recognitionRef.current.onend = () => {
+          console.log('Speech recognition ended');
+          setIsListening(false);
+          setInterimTranscript(''); // Clear interim transcript when ending
+          // Auto-restart in conversation mode
+          if (isConversationMode && !isSpeaking) {
+            setTimeout(() => {
+              if (recognitionRef.current && isConversationMode && !isListening) {
+                try {
+                  recognitionRef.current.start();
+                } catch (error) {
+                  console.error('Failed to restart recognition:', error);
+                }
+              }
+            }, 1000);
+          }
+        };
 
-      recognitionRef.current.onresult = (event: any) => {
-        const transcript = event.results[0][0].transcript;
-        setCurrentMessage(transcript);
-        setIsListening(false);
-      };
+        recognitionRef.current.onresult = (event: any) => {
+          let finalTranscript = '';
+          let interimTranscript = '';
 
-      recognitionRef.current.onerror = (event: any) => {
-        console.error('Speech recognition error:', event.error);
-        setIsListening(false);
-      };
+          for (let i = event.resultIndex; i < event.results.length; i++) {
+            const transcript = event.results[i][0].transcript;
+            if (event.results[i].isFinal) {
+              finalTranscript += transcript;
+            } else {
+              interimTranscript += transcript;
+            }
+          }
+
+          // Update interim transcript for live display
+          setInterimTranscript(interimTranscript);
+
+          if (finalTranscript.trim()) {
+            console.log('Final transcript:', finalTranscript);
+            setCurrentMessage(finalTranscript);
+            setInterimTranscript('');
+            setIsListening(false);
+            // Don't auto-send - wait for user to click send button
+          }
+        };
+
+        recognitionRef.current.onerror = (event: any) => {
+          console.error('Speech recognition error:', event.error);
+          setIsListening(false);
+          setIsStartingListening(false); // Reset starting flag on error
+          
+          if (event.error === 'not-allowed') {
+            alert('Microphone access denied. Please allow microphone permissions and try again.');
+          } else if (event.error === 'no-speech') {
+            console.log('No speech detected, stopping recognition');
+          } else {
+            alert(`Speech recognition error: ${event.error}`);
+          }
+        };
+
+        console.log('Speech recognition initialized successfully');
+        setSpeechSupported(true);
+      } catch (error) {
+        console.error('Failed to initialize speech recognition:', error);
+        setSpeechSupported(false);
+      }
+    } else {
+      console.warn('Speech recognition not supported in this browser');
+      setSpeechSupported(false);
     }
 
     // Initialize Speech Synthesis
     if (typeof window !== 'undefined' && 'speechSynthesis' in window) {
       speechSynthesisRef.current = window.speechSynthesis;
+      
+      // Function to load and select the best voice
+      const loadVoices = () => {
+        const voices = speechSynthesisRef.current?.getVoices() || [];
+        setAvailableVoices(voices);
+        
+        // Prioritize natural-sounding voices
+        const preferredVoices = [
+          // English voices - prioritize neural/natural voices
+          'Samantha', 'Alex', 'Victoria', 'Daniel', 'Karen', 'Moira',
+          // Google voices (Chrome)
+          'Google US English', 'Google UK English Female', 'Google UK English Male',
+          // Microsoft voices (Edge)
+          'Microsoft Aria Online (Natural) - English (United States)',
+          'Microsoft Jenny Online (Natural) - English (United States)',
+          'Microsoft Guy Online (Natural) - English (United States)',
+          'Microsoft Zira Desktop - English (United States)',
+          // Fallback voices
+          'en-US', 'en-GB'
+        ];
+        
+        let bestVoice = null;
+        
+        // Try to find the best voice
+        for (const preferredName of preferredVoices) {
+          bestVoice = voices.find(voice => 
+            voice.name.includes(preferredName) || 
+            voice.voiceURI.includes(preferredName)
+          );
+          if (bestVoice) break;
+        }
+        
+        // If no preferred voice found, use a female English voice or first English voice
+        if (!bestVoice) {
+          bestVoice = voices.find(voice => 
+            voice.lang.startsWith('en') && voice.name.toLowerCase().includes('female')
+          ) || voices.find(voice => voice.lang.startsWith('en'));
+        }
+        
+        // Final fallback to first available voice
+        if (!bestVoice && voices.length > 0) {
+          bestVoice = voices[0];
+        }
+        
+        setSelectedVoice(bestVoice || null);
+      };
+      
+      // Load voices immediately
+      loadVoices();
+      
+      // Also load when voices change (some browsers load voices asynchronously)
+      if (speechSynthesisRef.current.onvoiceschanged !== undefined) {
+        speechSynthesisRef.current.onvoiceschanged = loadVoices;
+      }
     }
 
     // Cleanup
@@ -179,11 +311,89 @@ export default function ANKIDApp() {
     { id: 4, title: 'Knowledge Seeker', description: 'Master 10 cards', reward: 75, completed: false, type: 'weekly', progress: 8, target: 10 }
   ]);
 
+  // Card data based on available card images
+  const cardDatabase = [
+    { 
+      id: 1, 
+      front: 'Hero Creation Mastery', 
+      back: 'Master the art of creating compelling hero characters with unique backstories and abilities',
+      subject: 'Creative Writing',
+      difficulty: 'Medium',
+      image: '/cards/创建英雄卡片封面-2.png',
+      type: 'uncommon'
+    },
+    { 
+      id: 2, 
+      front: 'Advanced Hero Design', 
+      back: 'Learn advanced techniques for designing heroes with complex motivations and character arcs',
+      subject: 'Storytelling',
+      difficulty: 'Hard',
+      image: '/cards/创建英雄卡片封面-3.png',
+      type: 'rare'
+    },
+    { 
+      id: 3, 
+      front: 'Hero Powers & Abilities', 
+      back: 'Explore the balance between power levels and interesting limitations in hero design',
+      subject: 'Game Design',
+      difficulty: 'Medium',
+      image: '/cards/创建英雄卡片封面-5.png',
+      type: 'uncommon'
+    },
+    { 
+      id: 4, 
+      front: 'Legendary Hero Concepts', 
+      back: 'Create heroes that become legendary through their actions and personal growth',
+      subject: 'Character Development',
+      difficulty: 'Hard',
+      image: '/cards/创建英雄卡片封面-6.png',
+      type: 'legendary'
+    },
+    { 
+      id: 5, 
+      front: 'Game Cover Design Basics', 
+      back: 'Learn the fundamentals of creating eye-catching game cover art that sells',
+      subject: 'Graphic Design',
+      difficulty: 'Easy',
+      image: '/cards/制作游戏卡片封面.png',
+      type: 'common'
+    },
+    { 
+      id: 6, 
+      front: 'Advanced Cover Composition', 
+      back: 'Master advanced composition techniques for professional game cover design',
+      subject: 'Visual Arts',
+      difficulty: 'Medium',
+      image: '/cards/制作游戏卡片封面-2.png',
+      type: 'uncommon'
+    },
+    { 
+      id: 7, 
+      front: 'Digital Art Mastery', 
+      back: 'Advanced digital painting techniques for creating stunning game artwork',
+      subject: 'Digital Art',
+      difficulty: 'Hard',
+      image: '/cards/制作游戏卡片封面-3.png',
+      type: 'rare'
+    },
+    { 
+      id: 8, 
+      front: 'Epic Cover Design', 
+      back: 'Create epic, award-winning game covers that stand out in any marketplace',
+      subject: 'Professional Design',
+      difficulty: 'Hard',
+      image: '/cards/制作游戏卡片封面-10.png',
+      type: 'legendary'
+    }
+  ];
+
   const [marketplaceItems] = useState<MarketplaceListing[]>([
-    { id: 1, cardId: 10, seller: 'StudyMaster99', price: 50, type: 'rare', front: 'What is quantum entanglement?', back: 'A quantum mechanical phenomenon...', subject: 'Physics', difficulty: 'Hard' },
-    { id: 2, cardId: 11, seller: 'BrainBox42', price: 25, type: 'common', front: 'Capital of Japan?', back: 'Tokyo', subject: 'Geography', difficulty: 'Easy' },
-    { id: 3, cardId: 12, seller: 'CardCollector', price: 100, type: 'legendary', front: 'Prove Fermat\'s Last Theorem', back: 'Andrew Wiles\' proof (1995)...', subject: 'Mathematics', difficulty: 'Hard' },
-    { id: 4, cardId: 13, seller: 'LanguageLover', price: 30, type: 'uncommon', front: '¿Cómo estás?', back: 'How are you? (Spanish)', subject: 'Spanish', difficulty: 'Medium' }
+    { id: 1, cardId: 1, seller: 'CreativeGuru', price: 45, type: 'uncommon', front: cardDatabase[0].front, back: cardDatabase[0].back, subject: cardDatabase[0].subject, difficulty: cardDatabase[0].difficulty },
+    { id: 2, cardId: 5, seller: 'DesignPro', price: 25, type: 'common', front: cardDatabase[4].front, back: cardDatabase[4].back, subject: cardDatabase[4].subject, difficulty: cardDatabase[4].difficulty },
+    { id: 3, cardId: 8, seller: 'EpicArtist', price: 120, type: 'legendary', front: cardDatabase[7].front, back: cardDatabase[7].back, subject: cardDatabase[7].subject, difficulty: cardDatabase[7].difficulty },
+    { id: 4, cardId: 3, seller: 'GameMaster', price: 35, type: 'uncommon', front: cardDatabase[2].front, back: cardDatabase[2].back, subject: cardDatabase[2].subject, difficulty: cardDatabase[2].difficulty },
+    { id: 5, cardId: 2, seller: 'StoryWeaver', price: 75, type: 'rare', front: cardDatabase[1].front, back: cardDatabase[1].back, subject: cardDatabase[1].subject, difficulty: cardDatabase[1].difficulty },
+    { id: 6, cardId: 7, seller: 'DigitalArt_Pro', price: 65, type: 'rare', front: cardDatabase[6].front, back: cardDatabase[6].back, subject: cardDatabase[6].subject, difficulty: cardDatabase[6].difficulty }
   ]);
 
   const [leaderboard] = useState<LeaderboardEntry[]>([
@@ -328,15 +538,191 @@ export default function ANKIDApp() {
   );
 
   const renderAIChat = () => {
-    const startListening = () => {
-      if (recognitionRef.current && !isListening) {
+    const handleSpeechMessage = async (spokenText: string) => {
+      if (!spokenText.trim()) return;
+      
+      const userMessage = { role: 'user' as const, content: spokenText, timestamp: new Date() };
+      setChatMessages(prev => [...prev, userMessage]);
+      setCurrentMessage('');
+      setIsLoading(true);
+      
+      // Stop listening while processing
+      if (recognitionRef.current && isListening) {
+        recognitionRef.current.stop();
+      }
+      
+      try {
+        const apiKey = process.env.NEXT_PUBLIC_GEMINI_API_KEY;
+        
+        if (!apiKey || apiKey === 'your_gemini_api_key_here') {
+          throw new Error('Please set your Gemini API key in .env.local');
+        }
+        
+        const genAI = new GoogleGenerativeAI(apiKey);
+        const model = genAI.getGenerativeModel({ model: 'gemini-2.5-flash' });
+        
+        // Build conversation history for context
+        const conversationHistory = chatMessages.map(msg => 
+          `${msg.role === 'user' ? 'Student' : 'AI Teacher'}: ${msg.content}`
+        ).join('\n');
+
+        // Optimized prompt for guided teaching methodology with full conversation context
+        const prompt = `You are a friendly primary school teacher with expertise in child psychology. You are pretending to be a "student" who wants to learn from them, but your real goal is to GUIDE them to understanding through strategic questions.
+
+CONVERSATION HISTORY:
+${conversationHistory}
+
+Student just said: "${spokenText}"
+
+TEACHING STRATEGY (based on conversation flow):
+1. If they give a CORRECT answer: Acknowledge it enthusiastically and provide the complete explanation to reinforce their learning
+2. If they give a PARTIAL answer: Guide them to the missing pieces with specific hints
+3. If they're STRUGGLING: Break it down into smaller, easier steps
+4. If they're OFF-TRACK: Gently redirect with a helpful clue
+5. REMEMBER what was discussed before - build on previous knowledge
+
+GUIDED QUESTIONING APPROACH:
+- Start with their level and build UP to understanding
+- Each question should give them a HINT toward the answer
+- When they get it right, CELEBRATE and explain the full concept
+- Don't just ask random questions - each one should teach something
+- Reference what they've already shared to show you're listening
+
+EXAMPLES:
+Topic: Photosynthesis
+❌ Bad: "What is photosynthesis?" (too broad)
+✅ Good: "I notice plants are green! What do you think that green color helps them do with sunlight?"
+
+If they say "make food":
+✅ "Exactly! You're so smart! Plants use their green parts to catch sunlight and make food. The green stuff is called chlorophyll, and it's like a tiny solar panel! What do you think plants need besides sunlight to make this food?"
+
+RULES:
+- Use simple words for ages 6-12
+- 1-2 sentences maximum (spoken aloud)
+- ALWAYS acknowledge correct answers before moving on
+- Give helpful hints, don't just repeat questions
+- When they understand, give them the complete picture as a reward
+- REMEMBER and reference previous parts of the conversation
+
+Current conversation context: Continue the learning journey based on what's been discussed. Guide them to discover the answer step by step, then celebrate their success with the full explanation.
+
+Respond as an excited student who wants to learn:`;
+        
+        const result = await model.generateContent(prompt);
+        const response = await result.response;
+        const aiResponseText = response.text();
+        
+        const aiResponse = {
+          role: 'assistant' as const,
+          content: aiResponseText,
+          timestamp: new Date()
+        };
+        
+        setChatMessages(prev => [...prev, aiResponse]);
+        
+        // Speak the response immediately
+        setTimeout(() => {
+          speakText(aiResponseText);
+        }, 300);
+        
+      } catch (error) {
+        console.error('Error calling Gemini API:', error);
+        
+        const errorMessage = "Sorry, I'm having trouble connecting right now. Can you try asking again?";
+        const errorResponse = {
+          role: 'assistant' as const,
+          content: errorMessage,
+          timestamp: new Date()
+        };
+        
+        setChatMessages(prev => [...prev, errorResponse]);
+        speakText(errorMessage);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    const startConversation = () => {
+      setIsConversationMode(true);
+      setIsListening(true);
+      if (recognitionRef.current) {
         recognitionRef.current.start();
+      }
+      // Brief welcome message
+      const welcomeMessage = "Hi! What would you like to learn about today?";
+      setChatMessages(prev => [...prev, {
+        role: 'assistant',
+        content: welcomeMessage,
+        timestamp: new Date()
+      }]);
+      speakText(welcomeMessage);
+    };
+
+    const stopConversation = () => {
+      setIsConversationMode(false);
+      if (recognitionRef.current && isListening) {
+        recognitionRef.current.stop();
+      }
+      if (speechSynthesisRef.current && isSpeaking) {
+        speechSynthesisRef.current.cancel();
+        setIsSpeaking(false);
+      }
+    };
+
+    const startListening = () => {
+      // Prevent rapid clicks
+      if (isStartingListening) {
+        console.log('Already starting recognition, ignoring click');
+        return;
+      }
+
+      if (recognitionRef.current && !isListening) {
+        try {
+          setIsStartingListening(true);
+          console.log('Starting speech recognition...');
+          
+          // Check if recognition is already running
+          if (recognitionRef.current.state === 'started' || recognitionRef.current.state === 'listening') {
+            console.log('Speech recognition already running');
+            setIsStartingListening(false);
+            return;
+          }
+          
+          recognitionRef.current.start();
+          
+          // Reset the starting flag after a delay
+          setTimeout(() => {
+            setIsStartingListening(false);
+          }, 1000);
+          
+        } catch (error) {
+          console.error('Error starting speech recognition:', error);
+          setIsStartingListening(false);
+          
+          if (error instanceof Error && error.message.includes('already started')) {
+            console.log('Recognition already started, ignoring...');
+            return;
+          }
+          
+          setIsListening(false); // Reset state on error
+          alert('Speech recognition failed to start. Please check your microphone permissions.');
+        }
+      } else if (!recognitionRef.current) {
+        alert('Speech recognition is not supported in your browser. Please use Chrome, Edge, or Safari.');
+      } else if (isListening) {
+        console.log('Speech recognition already listening');
       }
     };
 
     const stopListening = () => {
       if (recognitionRef.current && isListening) {
-        recognitionRef.current.stop();
+        try {
+          console.log('Stopping speech recognition...');
+          recognitionRef.current.stop();
+        } catch (error) {
+          console.error('Error stopping speech recognition:', error);
+          setIsListening(false); // Reset state on error
+        }
       }
     };
 
@@ -345,14 +731,37 @@ export default function ANKIDApp() {
         // Cancel any ongoing speech
         speechSynthesisRef.current.cancel();
         
-        const utterance = new SpeechSynthesisUtterance(text);
-        utterance.rate = 0.9;
-        utterance.pitch = 1;
-        utterance.volume = 1;
+        // Clean text for better speech (remove markdown, excessive punctuation)
+        const cleanText = text
+          .replace(/\*\*([^*]+)\*\*/g, '$1') // Remove bold markdown
+          .replace(/\*([^*]+)\*/g, '$1')     // Remove italic markdown
+          .replace(/`([^`]+)`/g, '$1')       // Remove code markdown
+          .replace(/#+\s/g, '')              // Remove headers
+          .replace(/\n\s*\n/g, '. ')         // Replace double newlines with periods
+          .replace(/\n/g, ', ')              // Replace single newlines with commas
+          .replace(/([.!?])\s*([.!?])/g, '$1 ') // Fix multiple punctuation
+          .trim();
+        
+        const utterance = new SpeechSynthesisUtterance(cleanText);
+        
+        // Use selected voice if available
+        if (selectedVoice) {
+          utterance.voice = selectedVoice;
+        }
+        
+        // Optimized settings for conversational speech
+        utterance.rate = 1.2;    // Faster for natural conversation
+        utterance.pitch = 1.0;   // Natural pitch
+        utterance.volume = 0.9;  // Comfortable volume
         
         utterance.onstart = () => setIsSpeaking(true);
-        utterance.onend = () => setIsSpeaking(false);
-        utterance.onerror = () => setIsSpeaking(false);
+        utterance.onend = () => {
+          setIsSpeaking(false);
+          // Don't automatically resume listening - wait for user interaction
+        };
+        utterance.onerror = () => {
+          setIsSpeaking(false);
+        };
         
         speechSynthesisRef.current.speak(utterance);
       }
@@ -367,15 +776,18 @@ export default function ANKIDApp() {
 
     const sendMessage = async () => {
       if (!currentMessage.trim()) return;
-      
-      const userMessage = { role: 'user' as const, content: currentMessage, timestamp: new Date() };
-      const messageToSend = currentMessage;
-      setChatMessages(prev => [...prev, userMessage]);
-      setCurrentMessage('');
-      setIsLoading(true);
+      await handleSpeechMessage(currentMessage);
+    };
+
+    const endConversation = async () => {
+      if (chatMessages.length <= 1) {
+        alert('Have a conversation first before getting a rating!');
+        return;
+      }
+
+      setIsGeneratingRating(true);
       
       try {
-        // Initialize Gemini AI
         const apiKey = process.env.NEXT_PUBLIC_GEMINI_API_KEY;
         
         if (!apiKey || apiKey === 'your_gemini_api_key_here') {
@@ -385,52 +797,135 @@ export default function ANKIDApp() {
         const genAI = new GoogleGenerativeAI(apiKey);
         const model = genAI.getGenerativeModel({ model: 'gemini-2.5-flash' });
         
-        // Create educational context for better responses
-        const prompt = `You are an AI tutor helping students learn. Please provide a clear, educational, and engaging response to this question: "${messageToSend}". 
+        // Build conversation history for analysis
+        const conversationHistory = chatMessages
+          .filter(msg => msg.content !== 'Hi! I\'m your curious student friend! I love learning new things. Can you pick something you know about and help me understand it step by step? Maybe science, math, or anything you find interesting!')
+          .map(msg => `${msg.role === 'user' ? 'Student' : 'AI Teacher'}: ${msg.content}`)
+          .join('\n');
 
-If the question is about a specific subject, explain concepts step by step. If it's a general question, provide helpful learning guidance. Keep your response informative but concise (2-3 paragraphs max). Since this will be spoken aloud, use natural conversational language.`;
+        const ratingPrompt = `You are a friendly teacher helping a student understand their learning progress. Analyze this conversation to see how well the student understands the topic they talked about.
+
+CONVERSATION TO ANALYZE:
+${conversationHistory}
+
+Please provide a JSON response with the following structure:
+{
+  "score": [number from 1-10, representing their knowledge level],
+  "feedback": "[2-3 sentences speaking directly to the student about their understanding, using simple words]",
+  "strengths": ["You understand [specific concept] really well!", "You did a great job explaining [specific thing]!", "You clearly know about [specific area]!"],
+  "improvements": ["To learn more, you could [simple suggestion]", "Try learning about [specific topic] next", "Practice explaining [specific concept] in more detail"]
+}
+
+HOW TO EVALUATE THE STUDENT:
+- Did they give correct information?
+- How well do they understand the topic?
+- Can they explain things clearly?
+- Do they know how different parts connect?
+
+SCORING GUIDE:
+1-3: You're just starting to learn about this topic - that's okay!
+4-5: You know some basics, but there's room to learn more
+6-7: You understand the main ideas pretty well!
+8-9: Wow! You really know this topic well!
+10: Amazing! You're like a mini-expert on this!
+
+WRITING STYLE:
+- Talk directly to the student using "You"
+- Use simple, encouraging words
+- Make it feel like a helpful friend explaining things
+- In "strengths": Start with "You understand..." or "You did great at..."
+- In "improvements": Give specific, easy-to-follow suggestions like "Try reading about..." or "Practice explaining..."
+- If they had wrong information, gently correct it: "Actually, [correct fact]. You can remember this by..."
+- Make learning sound fun and achievable!`;
         
-        const result = await model.generateContent(prompt);
+        const result = await model.generateContent(ratingPrompt);
         const response = await result.response;
-        const aiResponseText = response.text();
+        let ratingText = response.text();
         
-        const aiResponse = {
-          role: 'assistant' as const,
-          content: aiResponseText,
-          timestamp: new Date()
-        };
+        // Clean up the response to extract JSON
+        ratingText = ratingText.replace(/```json\n?/, '').replace(/```\n?$/, '').trim();
         
-        setChatMessages(prev => [...prev, aiResponse]);
-        
-        // Automatically speak the AI response
-        setTimeout(() => {
-          speakText(aiResponseText);
-        }, 500);
+        try {
+          const rating = JSON.parse(ratingText);
+          setConversationRating(rating);
+          setShowRating(true);
+        } catch (parseError) {
+          console.error('Failed to parse rating JSON:', parseError);
+          // Fallback rating
+          setConversationRating({
+            score: 7,
+            feedback: "Great conversation! You showed good engagement and shared your knowledge well.",
+            strengths: ["Active participation", "Clear communication", "Willingness to learn"],
+            improvements: ["Try exploring topics in more depth", "Ask more follow-up questions", "Connect concepts to real-world examples"]
+          });
+          setShowRating(true);
+        }
         
       } catch (error) {
-        console.error('Error calling Gemini API:', error);
-        
-        const errorResponse = {
-          role: 'assistant' as const,
-          content: `I'm sorry, I encountered an error. ${error instanceof Error ? error.message : 'Please make sure your Gemini API key is set correctly in .env.local file.'} 
-
-You can get a free API key from: https://aistudio.google.com/app/apikey
-
-For now, here's a helpful response: I'd be happy to help you learn about "${messageToSend}". Please try again once your API key is configured!`,
-          timestamp: new Date()
-        };
-        
-        setChatMessages(prev => [...prev, errorResponse]);
+        console.error('Error generating rating:', error);
+        // Fallback rating
+        setConversationRating({
+          score: 7,
+          feedback: "Thank you for the conversation! You demonstrated good learning engagement.",
+          strengths: ["Participated actively", "Shared knowledge", "Stayed engaged"],
+          improvements: ["Continue practicing", "Explore new topics", "Ask deeper questions"]
+        });
+        setShowRating(true);
       } finally {
-        setIsLoading(false);
+        setIsGeneratingRating(false);
       }
     };
 
+    const startNewConversation = () => {
+      setChatMessages([{
+        role: 'assistant',
+        content: 'Hi! I\'m your curious student friend! I love learning new things. Can you pick something you know about and help me understand it step by step? Maybe science, math, or anything you find interesting!',
+        timestamp: new Date()
+      }]);
+      setShowRating(false);
+      setConversationRating(null);
+      setCurrentMessage('');
+    };
+
     return (
-      <div className="max-w-4xl mx-auto h-[calc(100vh-200px)] flex flex-col">
-        <div className="ankid-paper p-6 mb-6">
-          <h2 className="ankid-section-title">AI Tutor - Speech Mode</h2>
-          <p className="ankid-section-subtitle">Speak to learn! Ask me anything with your voice.</p>
+      <div className="max-w-4xl mx-auto flex flex-col h-screen" style={{ height: 'calc(100vh - 120px)', maxHeight: '800px' }}>
+        <div className="ankid-paper p-6 mb-6 flex-shrink-0">
+          <h2 className="ankid-section-title">Your Teaching Assistant</h2>
+          <p className="ankid-section-subtitle">I'm your teacher who wants to learn from YOU! Teach me something today.</p>
+          
+          {/* Voice Selector */}
+          {availableVoices.length > 0 && (
+            <div className="flex items-center justify-center mt-4 mb-4">
+              <div className="flex items-center space-x-3">
+                <label className="text-sm font-medium" style={{color: 'var(--md3-on-surface)'}}>
+                  Voice:
+                </label>
+                <select
+                  value={selectedVoice?.name || ''}
+                  onChange={(e) => {
+                    const voice = availableVoices.find(v => v.name === e.target.value);
+                    setSelectedVoice(voice || null);
+                  }}
+                  className="px-3 py-1 rounded-lg border text-sm"
+                  style={{
+                    background: 'var(--md3-surface-variant)',
+                    borderColor: 'var(--md3-outline-variant)',
+                    color: 'var(--md3-on-surface)'
+                  }}
+                >
+                  {availableVoices
+                    .filter(voice => voice.lang.startsWith('en'))
+                    .map(voice => (
+                      <option key={voice.name} value={voice.name}>
+                        {voice.name.replace(/^.*?-\s*/, '').replace(/\s*\(.*?\)/, '')} 
+                        {voice.name.toLowerCase().includes('neural') ? ' ⭐' : ''}
+                        {voice.name.toLowerCase().includes('natural') ? ' ⭐' : ''}
+                      </option>
+                    ))}
+                </select>
+              </div>
+            </div>
+          )}
           
           {/* Speech Status Indicators */}
           <div className="flex items-center justify-center space-x-4 mt-4">
@@ -447,6 +942,12 @@ For now, here's a helpful response: I'd be happy to help you learn about "${mess
               {isSpeaking ? <Volume2 size={16} /> : <VolumeX size={16} />}
               <span className="text-sm">{isSpeaking ? 'Speaking...' : 'Ready to speak'}</span>
             </div>
+            
+            {selectedVoice && (
+              <div className="flex items-center space-x-2 px-3 py-1 rounded-full bg-green-100 text-green-700">
+                <span className="text-sm">🎵 {selectedVoice.name.split(' ')[0]}</span>
+              </div>
+            )}
           </div>
         </div>
 
@@ -454,126 +955,311 @@ For now, here's a helpful response: I'd be happy to help you learn about "${mess
         <div 
           ref={chatContainerRef}
           className="flex-1 ankid-paper p-6 mb-4 overflow-y-auto"
+          style={{ 
+            minHeight: '400px',
+            maxHeight: '500px',
+            height: '100%',
+            scrollBehavior: 'smooth',
+            overflowY: 'scroll'
+          }}
         >
-          <div className="space-y-4">
-            {chatMessages.map((message, index) => (
-              <div key={index} className={`flex ${message.role === 'user' ? 'justify-end' : 'justify-start'}`}>
-                <div
-                  className={`max-w-[80%] p-4 rounded-2xl ${
-                    message.role === 'user'
-                      ? 'ml-4'
-                      : 'mr-4'
-                  }`}
-                  style={{
-                    background: message.role === 'user' ? 'var(--md3-primary)' : 'var(--md3-secondary-container)',
-                    color: message.role === 'user' ? 'var(--md3-on-primary)' : 'var(--md3-on-secondary-container)'
-                  }}
-                >
-                  <div className="flex items-start justify-between">
-                    <p className="mb-2 whitespace-pre-wrap flex-1">{message.content}</p>
-                    {message.role === 'assistant' && (
-                      <button
-                        onClick={() => speakText(message.content)}
-                        disabled={isSpeaking}
-                        className="ml-2 p-1 rounded opacity-70 hover:opacity-100 transition-opacity"
-                        title="Speak this message"
-                      >
-                        {isSpeaking ? <Volume2 size={16} /> : <Volume2 size={16} />}
-                      </button>
-                    )}
+          {showRating && conversationRating ? (
+            /* Rating Display */
+            <div className="space-y-6">
+              <div className="text-center">
+                <h3 className="text-2xl font-bold mb-4" style={{color: 'var(--md3-primary)'}}>
+                  🎓 Conversation Complete!
+                </h3>
+                
+                {/* Score Display */}
+                <div className="mb-6">
+                  <div className="inline-flex items-center justify-center w-24 h-24 rounded-full text-3xl font-bold text-white mb-4"
+                       style={{
+                         background: conversationRating.score >= 8 ? '#4CAF50' : 
+                                    conversationRating.score >= 6 ? '#FF9800' : 
+                                    conversationRating.score >= 4 ? '#FFC107' : '#F44336'
+                       }}>
+                    {conversationRating.score}/10
                   </div>
-                  <p className="text-xs opacity-70">
-                    {message.timestamp.toLocaleTimeString()}
+                  <p className="text-lg" style={{color: 'var(--md3-on-surface)'}}>
+                    {conversationRating.feedback}
                   </p>
                 </div>
-              </div>
-            ))}
-            
-            {isLoading && (
-              <div className="flex justify-start">
-                <div className="mr-4 p-4 rounded-2xl" style={{background: 'var(--md3-secondary-container)'}}>
-                  <div className="flex space-x-1">
-                    <div className="w-2 h-2 bg-current rounded-full animate-bounce"></div>
-                    <div className="w-2 h-2 bg-current rounded-full animate-bounce" style={{animationDelay: '0.1s'}}></div>
-                    <div className="w-2 h-2 bg-current rounded-full animate-bounce" style={{animationDelay: '0.2s'}}></div>
-                  </div>
+
+                {/* Strengths */}
+                <div className="mb-6 p-4 rounded-lg" style={{background: 'var(--md3-secondary-container)'}}>
+                  <h4 className="text-lg font-bold mb-3 flex items-center justify-center" 
+                      style={{color: 'var(--md3-on-secondary-container)'}}>
+                    ⭐ Your Strengths
+                  </h4>
+                  <ul className="space-y-2">
+                    {conversationRating.strengths.map((strength, index) => (
+                      <li key={index} className="flex items-center text-sm"
+                          style={{color: 'var(--md3-on-secondary-container)'}}>
+                        <span className="mr-2">✅</span>
+                        {strength}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+
+                {/* Areas for Improvement */}
+                <div className="mb-6 p-4 rounded-lg" style={{background: 'var(--md3-tertiary-container)'}}>
+                  <h4 className="text-lg font-bold mb-3 flex items-center justify-center"
+                      style={{color: 'var(--md3-on-tertiary-container)'}}>
+                    🚀 Ways to Improve
+                  </h4>
+                  <ul className="space-y-2">
+                    {conversationRating.improvements.map((improvement, index) => (
+                      <li key={index} className="flex items-center text-sm"
+                          style={{color: 'var(--md3-on-tertiary-container)'}}>
+                        <span className="mr-2">💡</span>
+                        {improvement}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+
+                {/* Action Buttons */}
+                <div className="flex space-x-4 justify-center">
+                  <button
+                    onClick={startNewConversation}
+                    className="ankid-button px-6 py-3"
+                  >
+                    🔄 Start New Conversation
+                  </button>
+                  <button
+                    onClick={() => setShowRating(false)}
+                    className="ankid-button-secondary px-6 py-3"
+                  >
+                    📖 Review Conversation
+                  </button>
                 </div>
               </div>
-            )}
-          </div>
+            </div>
+          ) : (
+            /* Regular Chat Messages */
+            <div className="space-y-4">
+              {chatMessages.map((message, index) => (
+                <div key={index} className={`flex ${message.role === 'user' ? 'justify-end' : 'justify-start'}`}>
+                  <div
+                    className={`max-w-[80%] p-4 rounded-2xl ${
+                      message.role === 'user'
+                        ? 'ml-4'
+                        : 'mr-4'
+                    }`}
+                    style={{
+                      background: message.role === 'user' ? 'var(--md3-primary)' : 'var(--md3-secondary-container)',
+                      color: message.role === 'user' ? 'var(--md3-on-primary)' : 'var(--md3-on-secondary-container)'
+                    }}
+                  >
+                    <div className="flex items-start justify-between">
+                      <p className="mb-2 whitespace-pre-wrap flex-1">{message.content}</p>
+                      {message.role === 'assistant' && (
+                        <button
+                          onClick={() => speakText(message.content)}
+                          disabled={isSpeaking}
+                          className="ml-2 p-1 rounded opacity-70 hover:opacity-100 transition-opacity"
+                          title="Speak this message"
+                        >
+                          {isSpeaking ? <Volume2 size={16} /> : <Volume2 size={16} />}
+                        </button>
+                      )}
+                    </div>
+                    <p className="text-xs opacity-70">
+                      {message.timestamp.toLocaleTimeString()}
+                    </p>
+                  </div>
+                </div>
+              ))}
+              
+              {isLoading && (
+                <div className="flex justify-start">
+                  <div className="mr-4 p-4 rounded-2xl" style={{background: 'var(--md3-secondary-container)'}}>
+                    <div className="flex space-x-1">
+                      <div className="w-2 h-2 bg-current rounded-full animate-bounce"></div>
+                      <div className="w-2 h-2 bg-current rounded-full animate-bounce" style={{animationDelay: '0.1s'}}></div>
+                      <div className="w-2 h-2 bg-current rounded-full animate-bounce" style={{animationDelay: '0.2s'}}></div>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {isGeneratingRating && (
+                <div className="flex justify-center">
+                  <div className="p-4 rounded-2xl text-center" style={{background: 'var(--md3-primary-container)'}}>
+                    <div className="flex items-center space-x-2 mb-2">
+                      <div className="w-4 h-4 bg-current rounded-full animate-bounce"></div>
+                      <div className="w-4 h-4 bg-current rounded-full animate-bounce" style={{animationDelay: '0.1s'}}></div>
+                      <div className="w-4 h-4 bg-current rounded-full animate-bounce" style={{animationDelay: '0.2s'}}></div>
+                    </div>
+                    <p style={{color: 'var(--md3-on-primary-container)'}}>
+                      🎓 Analyzing your conversation and generating rating...
+                    </p>
+                  </div>
+                </div>
+              )}
+            </div>
+          )}
         </div>
 
         {/* Speech Input Controls */}
-        <div className="ankid-paper p-4">
-          <div className="flex space-x-4">
-            <input
-              type="text"
-              value={currentMessage}
-              onChange={(e) => setCurrentMessage(e.target.value)}
-              onKeyPress={(e) => e.key === 'Enter' && !isLoading && sendMessage()}
-              placeholder="Speak or type your question..."
-              className="flex-1 ankid-input"
-              disabled={isLoading || isListening}
-            />
-            
-            {/* Voice Input Button */}
-            <button
-              onClick={isListening ? stopListening : startListening}
-              disabled={isLoading || isSpeaking}
-              className={`px-4 py-2 rounded-lg font-medium transition-colors ${
-                isListening 
-                  ? 'bg-red-500 text-white hover:bg-red-600' 
-                  : 'ankid-button-secondary'
-              }`}
-              title={isListening ? 'Stop listening' : 'Start voice input'}
-            >
-              {isListening ? <MicOff size={20} /> : <Mic size={20} />}
-            </button>
-            
-            {/* Stop Speaking Button */}
-            {isSpeaking && (
-              <button
-                onClick={stopSpeaking}
-                className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors"
-                title="Stop speaking"
-              >
-                <VolumeX size={20} />
-              </button>
+        <div className="ankid-paper p-6 flex-shrink-0">
+          <div className="space-y-4">
+            {/* Conversation Controls */}
+            {!showRating && chatMessages.length > 1 && (
+              <div className="flex justify-center mb-4">
+                <button
+                  onClick={endConversation}
+                  disabled={isGeneratingRating || isLoading}
+                  className="px-6 py-3 bg-purple-500 text-white rounded-lg font-bold hover:bg-purple-600 disabled:opacity-50 transition-colors"
+                  style={{ fontFamily: "'Feather', sans-serif", fontWeight: "700" }}
+                >
+                  {isGeneratingRating ? '📊 Generating Rating...' : '🏁 End Conversation & Get Rating'}
+                </button>
+              </div>
             )}
-            
-            {/* Send Button */}
-            <button
-              onClick={sendMessage}
-              disabled={isLoading || !currentMessage.trim() || isListening}
-              className="ankid-button disabled:opacity-50"
-            >
-              Send
-            </button>
-          </div>
-          
-          <div className="mt-4 flex flex-wrap gap-2">
-            <span className="text-sm" style={{color: 'var(--md3-on-surface-variant)'}}>Quick topics (click to speak):</span>
-            {['Math help', 'Science concepts', 'History facts', 'Language learning', 'Study tips'].map((topic) => (
-              <button
-                key={topic}
-                onClick={() => {
-                  setCurrentMessage(topic);
-                  setTimeout(() => sendMessage(), 100);
-                }}
-                className="ankid-badge cursor-pointer hover:opacity-80 transition-opacity"
-                style={{background: 'var(--md3-tertiary-container)', color: 'var(--md3-on-tertiary-container)'}}
-              >
-                {topic}
-              </button>
-            ))}
-          </div>
-          
-          {/* Instructions */}
-          <div className="mt-4 p-3 rounded-lg" style={{background: 'var(--md3-surface-container)', color: 'var(--md3-on-surface-variant)'}}>
-            <p className="text-sm">
-              🎤 <strong>Speech Mode:</strong> Click the microphone to speak your question, or type normally. 
-              AI responses will be spoken automatically. Click the speaker icon on any message to hear it again.
-            </p>
+
+            {/* Voice Input Section */}
+            {!showRating && (
+              <div className="flex space-x-3">
+                <input
+                  type="text"
+                  value={currentMessage}
+                  onChange={(e) => setCurrentMessage(e.target.value)}
+                  onKeyPress={(e) => e.key === 'Enter' && !isLoading && sendMessage()}
+                  placeholder="Type your question or use voice input..."
+                  className="flex-1 p-4 border-2 border-gray-300 rounded-lg text-lg"
+                  disabled={isLoading || isListening}
+                  style={{ fontFamily: "'Feather', sans-serif", fontWeight: "700" }}
+                />
+                
+                {/* Voice Input Button */}
+                <button
+                  onClick={isListening ? stopListening : startListening}
+                  disabled={isLoading || isSpeaking || !speechSupported || isStartingListening}
+                  className={`px-6 py-4 rounded-lg font-bold transition-colors text-lg ${
+                    !speechSupported 
+                      ? 'bg-gray-400 text-white cursor-not-allowed'
+                      : isStartingListening
+                      ? 'bg-yellow-500 text-white cursor-wait'
+                      : isListening 
+                      ? 'bg-red-500 text-white hover:bg-red-600' 
+                      : 'bg-blue-500 text-white hover:bg-blue-600'
+                  }`}
+                  title={
+                    !speechSupported 
+                      ? 'Speech recognition not supported' 
+                      : isStartingListening
+                      ? 'Starting voice recognition...'
+                      : isListening 
+                      ? 'Stop listening' 
+                      : 'Start voice input'
+                  }
+                  style={{ fontFamily: "'Feather', sans-serif", fontWeight: "700" }}
+                >
+                  {!speechSupported 
+                    ? '🚫 No Mic' 
+                    : isStartingListening
+                    ? '⏳ Starting...'
+                    : isListening 
+                    ? '🛑 Stop' 
+                    : '🎤 Voice'
+                  }
+                </button>
+                
+                {/* Send Button */}
+                <button
+                  onClick={sendMessage}
+                  disabled={isLoading || !currentMessage.trim() || isListening}
+                  className="px-8 py-4 bg-green-500 text-white rounded-lg font-bold hover:bg-green-600 disabled:opacity-50 transition-colors text-lg"
+                  style={{ fontFamily: "'Feather', sans-serif", fontWeight: "700" }}
+                >
+                  {isLoading ? '🤔 Thinking...' : '📤 Send'}
+                </button>
+              </div>
+            )}
+
+            {/* Live Transcript Display */}
+            {isListening && !showRating && (
+              <div className="p-4 bg-blue-50 border-2 border-blue-200 rounded-lg">
+                <div className="flex items-center space-x-2 mb-2">
+                  <div className="w-3 h-3 bg-red-500 rounded-full animate-pulse"></div>
+                  <span className="text-blue-800 font-bold" style={{ fontFamily: "'Feather', sans-serif" }}>
+                    Listening...
+                  </span>
+                </div>
+                <p className="text-gray-800 text-lg min-h-[1.5rem]" style={{ fontFamily: "'Feather', sans-serif", fontWeight: "700" }}>
+                  {interimTranscript || "Say something..."}
+                </p>
+              </div>
+            )}
+
+            {/* AI Speaking Status */}
+            {isSpeaking && !showRating && (
+              <div className="p-4 bg-green-50 border-2 border-green-200 rounded-lg">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center space-x-2">
+                    <Volume2 className="animate-pulse text-green-600" size={20} />
+                    <span className="text-green-800 font-bold" style={{ fontFamily: "'Feather', sans-serif" }}>
+                      AI is speaking...
+                    </span>
+                  </div>
+                  <button
+                    onClick={stopSpeaking}
+                    className="text-green-600 hover:text-green-800 underline font-bold"
+                    style={{ fontFamily: "'Feather', sans-serif" }}
+                  >
+                    Stop
+                  </button>
+                </div>
+              </div>
+            )}
+
+            {/* Voice Selection */}
+            {!showRating && (
+              <details className="bg-gray-50 p-4 rounded-lg">
+                <summary className="cursor-pointer text-gray-700 font-bold" style={{ fontFamily: "'Feather', sans-serif" }}>
+                  🎵 Voice Settings
+                </summary>
+                <div className="mt-3">
+                  <select
+                    value={selectedVoice?.name || ''}
+                    onChange={(e) => {
+                      const voice = availableVoices.find(v => v.name === e.target.value);
+                      setSelectedVoice(voice || null);
+                    }}
+                    className="w-full p-3 border border-gray-300 rounded-lg bg-white font-bold"
+                    style={{ fontFamily: "'Feather', sans-serif" }}
+                  >
+                    <option value="">Default Voice</option>
+                    {availableVoices
+                      .filter(voice => voice.lang.startsWith('en'))
+                      .map((voice) => (
+                        <option key={voice.name} value={voice.name}>
+                          {voice.name} ({voice.lang})
+                        </option>
+                      ))}
+                  </select>
+                </div>
+              </details>
+            )}
+
+            {/* Instructions */}
+            {!showRating && (
+              <div className="p-4 bg-gray-100 rounded-lg">
+                {!speechSupported ? (
+                  <p className="text-sm text-red-600" style={{ fontFamily: "'Feather', sans-serif", fontWeight: "700" }}>
+                    ⚠️ <strong>Speech recognition not supported in your browser.</strong> Please use Chrome, Edge, or Safari for voice input. You can still type your messages!
+                  </p>
+                ) : (
+                  <p className="text-sm text-gray-600" style={{ fontFamily: "'Feather', sans-serif", fontWeight: "700" }}>
+                    🎓 <strong>How it works:</strong> Share what you know about any topic! I'll ask helpful questions to guide you to deeper understanding. 
+                    When you get things right, I'll celebrate and explain the complete picture to help you learn even more!
+                  </p>
+                )}
+              </div>
+            )}
           </div>
         </div>
       </div>
@@ -714,48 +1400,71 @@ For now, here's a helpful response: I'd be happy to help you learn about "${mess
       </div>
 
       <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {marketplaceItems.map(item => (
-          <div key={item.id} className="ankid-card">
-            <div className="flex justify-between items-start mb-3">
-              <div className="ankid-badge" style={{
-                background: item.type === 'common' ? 'var(--md3-surface-container)' :
-                           item.type === 'uncommon' ? 'var(--md3-secondary-container)' :
-                           item.type === 'rare' ? 'var(--md3-tertiary-container)' :
-                           'var(--md3-primary-container)',
-                color: item.type === 'common' ? 'var(--md3-on-surface)' :
-                       item.type === 'uncommon' ? 'var(--md3-on-secondary-container)' :
-                       item.type === 'rare' ? 'var(--md3-on-tertiary-container)' :
-                       'var(--md3-on-primary-container)'
-              }}>
-                {item.type.toUpperCase()}
+        {marketplaceItems.map(item => {
+          const cardData = cardDatabase.find(card => card.id === item.cardId);
+          return (
+            <div key={item.id} className="ankid-card">
+              {/* Card Image */}
+              {cardData?.image && (
+                <div className="mb-4 relative h-48 rounded-lg overflow-hidden">
+                  <img 
+                    src={cardData.image} 
+                    alt={item.front}
+                    className="w-full h-full object-cover"
+                    style={{ objectPosition: 'center' }}
+                  />
+                  <div className="absolute top-2 right-2">
+                    <div className="ankid-badge text-xs" style={{
+                      background: item.type === 'common' ? 'var(--md3-surface-container)' :
+                                 item.type === 'uncommon' ? 'var(--md3-secondary-container)' :
+                                 item.type === 'rare' ? 'var(--md3-tertiary-container)' :
+                                 'var(--md3-primary-container)',
+                      color: item.type === 'common' ? 'var(--md3-on-surface)' :
+                             item.type === 'uncommon' ? 'var(--md3-on-secondary-container)' :
+                             item.type === 'rare' ? 'var(--md3-on-tertiary-container)' :
+                             'var(--md3-on-primary-container)'
+                    }}>
+                      {item.type.toUpperCase()}
+                    </div>
+                  </div>
+                </div>
+              )}
+              
+              <div className="flex justify-between items-start mb-3">
+                <div className="ankid-badge" style={{
+                  background: 'var(--md3-surface-container)',
+                  color: 'var(--md3-on-surface)'
+                }}>
+                  {item.subject}
+                </div>
+                <div className="flex items-center space-x-1">
+                  <span className="text-sm font-bold">🪙 {item.price}</span>
+                </div>
               </div>
-              <div className="flex items-center space-x-1">
-                <span className="text-sm font-bold">🪙 {item.price}</span>
+              
+              <h4 className="font-semibold mb-2" style={{color: 'var(--md3-on-surface)'}}>
+                {item.front}
+              </h4>
+              <p className="text-sm mb-3" style={{color: 'var(--md3-on-surface-variant)'}}>
+                {item.back.length > 80 ? item.back.substring(0, 80) + '...' : item.back}
+              </p>
+              
+              <div className="flex justify-between items-center mb-4">
+                <span className="ankid-badge">{item.difficulty}</span>
+                <span className="text-xs" style={{color: 'var(--md3-on-surface-variant)'}}>
+                  by {item.seller}
+                </span>
               </div>
+              
+              <button 
+                className="ankid-button w-full"
+                disabled={userStats.coins < item.price}
+              >
+                {userStats.coins >= item.price ? 'Buy Card' : 'Insufficient Coins'}
+              </button>
             </div>
-            
-            <h4 className="font-semibold mb-2" style={{color: 'var(--md3-on-surface)'}}>
-              {item.front}
-            </h4>
-            <p className="text-sm mb-3" style={{color: 'var(--md3-on-surface-variant)'}}>
-              {item.back.length > 80 ? item.back.substring(0, 80) + '...' : item.back}
-            </p>
-            
-            <div className="flex justify-between items-center mb-4">
-              <span className="ankid-badge">{item.subject}</span>
-              <span className="text-xs" style={{color: 'var(--md3-on-surface-variant)'}}>
-                by {item.seller}
-              </span>
-            </div>
-            
-            <button 
-              className="ankid-button w-full"
-              disabled={userStats.coins < item.price}
-            >
-              {userStats.coins >= item.price ? 'Buy Card' : 'Insufficient Coins'}
-            </button>
-          </div>
-        ))}
+          );
+        })}
       </div>
     </div>
   );
@@ -917,7 +1626,7 @@ For now, here's a helpful response: I'd be happy to help you learn about "${mess
           <div className="flex space-x-2 pb-4">
             {[
               { id: 'dashboard', label: 'Dashboard' },
-              { id: 'ai-chat', label: 'AI Tutor' },
+              { id: 'ai-chat', label: 'Teaching Assistant' },
               { id: 'collection', label: 'Collection' },
               { id: 'marketplace', label: 'Marketplace' },
               { id: 'quests', label: 'Quests' },
