@@ -287,8 +287,8 @@ export default function ANKIDApp() {
           ].map((item, index) => (
             <div key={index} className="text-center p-4 rounded-xl border" 
                  style={{
-                   background: `linear-gradient(135deg, ${item.color}10 0%, ${item.color}05 100%)`,
-                   borderColor: `${item.color}20`
+                   background: 'var(--md3-surface-container)',
+                   borderColor: 'var(--md3-outline-variant)'
                  }}>
               <item.icon size={32} style={{color: item.color}} className="mx-auto mb-2" />
               <p className="text-sm font-medium" style={{color: 'var(--md3-on-surface)'}}>{item.label}</p>
@@ -533,12 +533,14 @@ export default function ANKIDApp() {
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4 mt-6">
           {flashcards.map(card => (
             <div key={card.id} className="ankid-card">
-              <div className="flex justify-between items-start mb-3">
-                <div className="ankid-badge" style={{
-                  background: card.difficulty === 'Easy' ? 'var(--md3-secondary-container)' : 
-                             card.difficulty === 'Medium' ? 'var(--md3-tertiary-container)' : 
-                             'var(--md3-error-container)'
-                }}>
+              <div className="flex justify-between items-start mb-3">              <div className="ankid-badge" style={{
+                background: card.difficulty === 'Easy' ? 'var(--md3-secondary-container)' : 
+                           card.difficulty === 'Medium' ? 'var(--md3-tertiary-container)' : 
+                           'var(--md3-primary-container)',
+                color: card.difficulty === 'Easy' ? 'var(--md3-on-secondary-container)' : 
+                       card.difficulty === 'Medium' ? 'var(--md3-on-tertiary-container)' : 
+                       'var(--md3-on-primary-container)'
+              }}>
                   {card.subject}
                 </div>
                 {card.mastered && <Star size={16} style={{color: 'var(--md3-secondary)'}} fill="currentColor" />}
@@ -583,10 +585,14 @@ export default function ANKIDApp() {
           <div key={item.id} className="ankid-card">
             <div className="flex justify-between items-start mb-3">
               <div className="ankid-badge" style={{
-                background: item.type === 'common' ? 'var(--md3-surface-variant)' :
+                background: item.type === 'common' ? 'var(--md3-surface-container)' :
                            item.type === 'uncommon' ? 'var(--md3-secondary-container)' :
                            item.type === 'rare' ? 'var(--md3-tertiary-container)' :
-                           'var(--md3-primary-container)'
+                           'var(--md3-primary-container)',
+                color: item.type === 'common' ? 'var(--md3-on-surface)' :
+                       item.type === 'uncommon' ? 'var(--md3-on-secondary-container)' :
+                       item.type === 'rare' ? 'var(--md3-on-tertiary-container)' :
+                       'var(--md3-on-primary-container)'
               }}>
                 {item.type.toUpperCase()}
               </div>
@@ -684,10 +690,10 @@ export default function ANKIDApp() {
         <div className="space-y-4">
           {leaderboard.map(entry => (
             <div key={entry.rank} className={`flex items-center justify-between p-4 rounded-lg ${
-              entry.name === 'You' ? 'bg-gradient-to-r from-blue-50 to-purple-50 border-2' : 'border'
+              entry.name === 'You' ? 'border-2' : 'border'
             }`} style={{
               borderColor: entry.name === 'You' ? 'var(--md3-primary)' : 'var(--md3-outline-variant)',
-              background: entry.name === 'You' ? 'var(--md3-primary-container)' : 'transparent'
+              background: entry.name === 'You' ? 'var(--md3-primary-container)' : 'var(--md3-surface-container)'
             }}>
               <div className="flex items-center space-x-4">
                 <div className="w-12 h-12 rounded-full flex items-center justify-center font-bold text-white"
@@ -695,7 +701,8 @@ export default function ANKIDApp() {
                        background: entry.rank === 1 ? '#FFD700' : 
                                   entry.rank === 2 ? '#C0C0C0' : 
                                   entry.rank === 3 ? '#CD7F32' : 
-                                  'var(--md3-surface-variant)'
+                                  'var(--md3-primary)',
+                       color: entry.rank <= 3 ? '#000000' : '#ffffff'
                      }}>
                   {entry.rank <= 3 ? <Crown size={20} /> : entry.rank}
                 </div>
@@ -763,14 +770,9 @@ export default function ANKIDApp() {
             <div>
               <h4 className="font-semibold mb-3" style={{color: 'var(--md3-on-surface)'}}>Background</h4>
               <div className="grid grid-cols-4 gap-3">
-                {[
-                  'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-                  'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)',
-                  'linear-gradient(135deg, #4facfe 0%, #00f2fe 100%)',
-                  'linear-gradient(135deg, #43e97b 0%, #38f9d7 100%)'
-                ].map((gradient, index) => (
+                {['#45bfdb', '#f5dd59', '#ff6b9d', '#72777b'].map((color, index) => (
                   <button key={index} className="w-12 h-12 rounded-lg border-2"
-                          style={{background: gradient, borderColor: 'var(--md3-outline-variant)'}} />
+                          style={{background: color, borderColor: 'var(--md3-outline-variant)'}} />
                 ))}
               </div>
             </div>
@@ -838,10 +840,7 @@ export default function ANKIDApp() {
               <h1 className="text-4xl font-bold m-0" 
                   style={{
                     fontFamily: 'Plus Jakarta Sans',
-                    background: 'linear-gradient(135deg, var(--md3-primary) 0%, var(--md3-secondary) 100%)',
-                    backgroundClip: 'text',
-                    WebkitBackgroundClip: 'text',
-                    WebkitTextFillColor: 'transparent'
+                    color: 'var(--md3-primary)'
                   }}>
                 ANKID
               </h1>
