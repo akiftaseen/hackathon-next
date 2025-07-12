@@ -468,24 +468,24 @@ export default function ANKIDApp() {
         </div>
       </div>
 
-      <div className="grid md:grid-cols-2 gap-6">
-        <div className="ankid-card group">
+      <div className="flex justify-center">
+        <div className="ankid-card group max-w-md">
           <div className="flex items-center space-x-4">
             <div className="w-12 h-12 rounded-xl flex items-center justify-center transition-all duration-300 group-hover:scale-110 group-hover:rotate-12"
                  style={{background: 'linear-gradient(135deg, var(--md3-primary) 0%, var(--md3-tertiary) 100%)'}}>
-              <BookOpen size={24} className="fun-icon" color="white" />
+              <Sparkles size={24} className="fun-icon" color="white" />
             </div>
             <div className="flex-1">
               <h3 className="font-bold text-lg" style={{color: 'var(--md3-on-surface)'}}>
-                Continue Studying <span className="fun-emoji">📖</span>
+                Start Learning with AI <span className="fun-emoji">✨</span>
               </h3>
               <p className="text-sm font-medium" style={{color: 'var(--md3-on-surface-variant)'}}>
-                Pick up where you left off! <span className="fun-emoji">🎯</span>
+                Get personalized tutoring now! <span className="fun-emoji">�</span>
               </p>
             </div>
           </div>
-          <button onClick={() => showSection('study')} className="ankid-button w-full mt-4">
-            <span className="fun-emoji">🚀</span> Start Session <span className="fun-emoji">✨</span>
+          <button onClick={() => showSection('ai-chat')} className="ankid-button w-full mt-4">
+            <span className="fun-emoji">✨</span> Talk to AI Tutor <span className="fun-emoji">🚀</span>
           </button>
         </div>
         
@@ -497,16 +497,14 @@ export default function ANKIDApp() {
             </div>
             <div className="flex-1">
               <h3 className="font-bold text-lg" style={{color: 'var(--md3-on-surface)'}}>
-                Review Collection <span className="fun-emoji">📚</span>
+                Review Collection - REMOVED
               </h3>
               <p className="text-sm font-medium" style={{color: 'var(--md3-on-surface-variant)'}}>
                 Browse your knowledge collection! <span className="fun-emoji">�</span>
               </p>
             </div>
           </div>
-          <button onClick={() => showSection('collection')} className="ankid-button-secondary w-full mt-4">
-            <span className="fun-emoji">👀</span> View Collection <span className="fun-emoji">✨</span>
-          </button>
+
         </div>
       </div>
 
@@ -1342,61 +1340,6 @@ WRITING STYLE:
     );
   };
 
-  const renderCollection = () => (
-    <div className="max-w-6xl mx-auto">
-      <div className="ankid-paper p-8">
-        <h2 className="ankid-section-title">
-          <span className="fun-emoji">📚</span> Your Collection <span className="fun-emoji">✨</span>
-        </h2>
-        <p className="ankid-section-subtitle">
-          Browse and review your flashcard collection <span className="fun-emoji">🔍</span>
-        </p>
-        
-        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4 mt-6">
-          {flashcards.map(card => (
-            <div key={card.id} className="ankid-card">
-              <div className="flex justify-between items-start mb-3">
-                <div className="ankid-badge" style={{
-                  background: card.difficulty === 'Easy' ? 'var(--md3-secondary-container)' : 
-                             card.difficulty === 'Medium' ? 'var(--md3-tertiary-container)' : 
-                             'var(--md3-primary-container)',
-                  color: card.difficulty === 'Easy' ? 'var(--md3-on-secondary-container)' : 
-                         card.difficulty === 'Medium' ? 'var(--md3-on-tertiary-container)' : 
-                         'var(--md3-on-primary-container)'
-                }}>
-                  {card.subject}
-                </div>
-                {card.mastered && <Star size={16} style={{color: 'var(--md3-secondary)'}} fill="currentColor" />}
-              </div>
-              <h4 className="font-semibold mb-2" style={{color: 'var(--md3-on-surface)'}}>
-                {card.front}
-              </h4>
-              <p className="text-sm" style={{color: 'var(--md3-on-surface-variant)'}}>
-                {card.back.length > 60 ? card.back.substring(0, 60) + '...' : card.back}
-              </p>
-              <div className="flex justify-between items-center mt-4">
-                <span className="ankid-badge">{card.difficulty}</span>
-                <span className="text-xs" style={{color: card.mastered ? 'var(--md3-secondary)' : 'var(--md3-on-surface-variant)'}}>
-                  {card.mastered ? 'Mastered ⭐' : 'Learning 📖'}
-                </span>
-              </div>
-            </div>
-          ))}
-        </div>
-        
-        {flashcards.length === 0 && (
-          <div className="text-center py-12">
-            <div className="fun-emoji text-6xl mb-4">📝</div>
-            <h3 className="ankid-section-title mb-2">No Cards Yet</h3>
-            <p className="ankid-section-subtitle">
-              Your collection is empty. Use the Teaching Assistant to learn and create cards through conversation! <span className="fun-emoji">🎓</span>
-            </p>
-          </div>
-        )}
-      </div>
-    </div>
-  );
-
   const renderMarketplace = () => (
     <div className="max-w-6xl mx-auto">
       <div className="ankid-paper p-8 mb-8">
@@ -1592,8 +1535,6 @@ WRITING STYLE:
         return renderDashboard();
       case 'ai-chat':
         return renderAIChat();
-      case 'collection':
-        return renderCollection();
       case 'marketplace':
         return renderMarketplace();
       case 'quests':
@@ -1642,7 +1583,6 @@ WRITING STYLE:
               {[
                 { id: 'dashboard', label: '🏠 Dashboard', shortLabel: '🏠' },
                 { id: 'ai-chat', label: '✨ AI Tutor', shortLabel: '✨' },
-                { id: 'collection', label: '📚 Collection', shortLabel: '📚' },
                 { id: 'marketplace', label: '🛒 Market', shortLabel: '🛒' },
                 { id: 'quests', label: '⚡ Quests', shortLabel: '⚡' },
                 { id: 'leaderboard', label: '🏆 Leaders', shortLabel: '🏆' }
