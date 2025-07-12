@@ -1,21 +1,42 @@
 @import "tailwindcss";
 
+/* UT Breado Font Duo */
+@font-face {
+  font-family: 'UT Breado Sans';
+  src: url('/ut breado demo/UT Breado Sans Demo/UT Breado Sans Demo.woff2') format('woff2'),
+       url('/ut breado demo/UT Breado Sans Demo/UT Breado Sans Demo.woff') format('woff'),
+       url('/ut breado demo/UT Breado Sans Demo/UT Breado Sans Demo.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'UT Breado Script';
+  src: url('/ut breado demo/UT Breado Script Demo/UT Breado Script Demo.woff2') format('woff2'),
+       url('/ut breado demo/UT Breado Script Demo/UT Breado Script Demo.woff') format('woff'),
+       url('/ut breado demo/UT Breado Script Demo/UT Breado Script Demo.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+
 :root {
-  /* Material 3 Color System - No Grey */
-  --md3-primary: #45bfdb;
+  /* Material 3 Color System - Navy Blue & Light Pink */
+  --md3-primary: #1a237e;
   --md3-on-primary: #ffffff;
-  --md3-primary-container: #b8e6f0;
-  --md3-on-primary-container: #001f26;
+  --md3-primary-container: #c5cae9;
+  --md3-on-primary-container: #000051;
   
-  --md3-secondary: #f5dd59;
-  --md3-on-secondary: #1a1700;
-  --md3-secondary-container: #faf4c4;
-  --md3-on-secondary-container: #1f1b00;
+  --md3-secondary: #f8bbd9;
+  --md3-on-secondary: #1a0a14;
+  --md3-secondary-container: #fce4ec;
+  --md3-on-secondary-container: #2e1a24;
   
-  --md3-tertiary: #ff6b9d;
+  --md3-tertiary: #e1bee7;
   --md3-on-tertiary: #ffffff;
-  --md3-tertiary-container: #ffb3cc;
-  --md3-on-tertiary-container: #2c0011;
+  --md3-tertiary-container: #f3e5f5;
+  --md3-on-tertiary-container: #4a148c;
   
   --md3-surface: #ffffff;
   --md3-surface-variant: #ffffff;
@@ -24,8 +45,8 @@
   --md3-on-surface: #000000;
   --md3-on-surface-variant: #000000;
   
-  --md3-outline: #45bfdb;
-  --md3-outline-variant: #b8e6f0;
+  --md3-outline: #000000;
+  --md3-outline-variant: #000000;
   
   --md3-background: #ffffff;
   --md3-on-background: #000000;
@@ -104,8 +125,8 @@
     --md3-surface-container-high: #000000;
     --md3-on-surface: #ffffff;
     --md3-on-surface-variant: #ffffff;
-    --md3-outline: #45bfdb;
-    --md3-outline-variant: #b8e6f0;
+    --md3-outline: #ffffff;
+    --md3-outline-variant: #ffffff;
     --md3-background: #000000;
     --md3-on-background: #ffffff;
   }
@@ -114,7 +135,23 @@
 body {
   background: var(--md3-background);
   color: var(--md3-on-background);
-  font-family: 'Helvetica', 'Arial', sans-serif;
+  font-family: 'UT Breado Sans', 'Helvetica', 'Arial', sans-serif;
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+}
+
+/* Prevent font clipping */
+* {
+  text-overflow: clip;
+  overflow-wrap: break-word;
+}
+
+/* Ensure proper spacing for custom fonts */
+h1, h2, h3, h4, h5, h6, p, span, div {
+  font-feature-settings: "kern" 1;
+  font-variant-ligatures: common-ligatures;
 }
 
 /* Material 3 Components with Helvetica and Hatching */
@@ -133,7 +170,8 @@ body {
   cursor: pointer;
   position: relative;
   overflow: hidden;
-  font-family: 'Helvetica', 'Arial', sans-serif;
+  font-family: 'UT Breado Sans', 'Helvetica', 'Arial', sans-serif;
+  line-height: 1.4;
   transform: translateZ(0);
 }
 
@@ -159,11 +197,12 @@ body {
   transition: all 200ms var(--md3-motion-easing-emphasized);
   background: var(--md3-surface);
   color: var(--md3-on-surface);
-  border: 2px solid var(--md3-primary);
+  border: 1px solid #000000;
   cursor: pointer;
   position: relative;
   overflow: hidden;
-  font-family: 'Helvetica', 'Arial', sans-serif;
+  font-family: 'UT Breado Sans', 'Helvetica', 'Arial', sans-serif;
+  line-height: 1.4;
   transform: translateZ(0);
 }
 
@@ -172,7 +211,7 @@ body {
   padding: 24px;
   transition: all 300ms var(--md3-motion-easing-emphasized);
   background: var(--md3-surface);
-  border: 2px solid var(--md3-primary);
+  border: 1px solid #000000;
   position: relative;
   transform: translateZ(0);
 }
@@ -203,7 +242,7 @@ body {
   border-radius: 24px;
   transition: all 300ms var(--md3-motion-easing-emphasized);
   background: var(--md3-surface);
-  border: 2px solid var(--md3-primary);
+  border: 1px solid #000000;
   position: relative;
   overflow: hidden;
 }
@@ -225,11 +264,12 @@ body {
   width: 100%;
   padding: 16px 24px;
   border-radius: 16px;
-  border: 2px solid var(--md3-primary);
+  border: 1px solid #000000;
   transition: all 300ms var(--md3-motion-easing-emphasized);
   background: var(--md3-surface);
   color: var(--md3-on-surface);
-  font-family: 'Helvetica', 'Arial', sans-serif;
+  font-family: 'UT Breado Sans', 'Helvetica', 'Arial', sans-serif;
+  line-height: 1.5;
 }
 
 .ankid-input:focus {
@@ -248,7 +288,8 @@ body {
   font-weight: 600;
   background: var(--md3-secondary);
   color: var(--md3-on-secondary);
-  font-family: 'Helvetica', 'Arial', sans-serif;
+  font-family: 'UT Breado Sans', 'Helvetica', 'Arial', sans-serif;
+  line-height: 1.3;
 }
 
 .ankid-nav-tab {
@@ -270,19 +311,21 @@ body {
 }
 
 .ankid-section-title {
-  font-family: 'Helvetica', 'Arial', sans-serif;
+  font-family: 'UT Breado Script', 'UT Breado Sans', 'Helvetica', 'Arial', sans-serif;
   font-size: var(--md3-headline-large);
   font-weight: 700;
   color: var(--md3-primary);
   text-align: center;
   margin-bottom: 8px;
+  line-height: 1.3;
 }
 
 .ankid-section-subtitle {
-  font-family: 'Helvetica', 'Arial', sans-serif;
+  font-family: 'UT Breado Sans', 'Helvetica', 'Arial', sans-serif;
   color: var(--md3-on-surface);
   text-align: center;
   font-size: var(--md3-body-large);
+  line-height: 1.5;
 }
 
 .ankid-progress-bar {
@@ -291,7 +334,7 @@ body {
   transition: all 500ms var(--md3-motion-easing-emphasized);
   background: var(--md3-surface);
   border-radius: 8px;
-  border: 1px solid var(--md3-primary);
+  border: 1px solid #000000;
   overflow: hidden;
 }
 
