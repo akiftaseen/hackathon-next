@@ -854,9 +854,9 @@ WRITING STYLE:
           // Fallback rating
           setConversationRating({
             score: 7,
-            feedback: "Great conversation! You showed good engagement and shared your knowledge well.",
-            strengths: ["Active participation", "Clear communication", "Willingness to learn"],
-            improvements: ["Try exploring topics in more depth", "Ask more follow-up questions", "Connect concepts to real-world examples"]
+            feedback: "You did a great job sharing what you know! You explained things clearly and showed good understanding of the topic.",
+            strengths: ["You participated really well!", "You shared your knowledge clearly", "You stayed focused on learning"],
+            improvements: ["Try exploring this topic in more detail", "Practice explaining the connections between different parts", "Look up some fun facts about this subject"]
           });
           setShowRating(true);
         }
@@ -866,9 +866,9 @@ WRITING STYLE:
         // Fallback rating
         setConversationRating({
           score: 7,
-          feedback: "Thank you for the conversation! You demonstrated good learning engagement.",
-          strengths: ["Participated actively", "Shared knowledge", "Stayed engaged"],
-          improvements: ["Continue practicing", "Explore new topics", "Ask deeper questions"]
+          feedback: "Thanks for having a great conversation with me! You showed that you really want to learn and share knowledge.",
+          strengths: ["You joined in actively", "You shared what you know", "You kept trying to learn"],
+          improvements: ["Keep practicing and learning new things", "Try reading more about topics you're curious about", "Practice explaining things to friends or family"]
         });
         setShowRating(true);
       } finally {
