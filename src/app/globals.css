@@ -1,21 +1,11 @@
 @import "tailwindcss";
 
-/* UT Breado Font Duo */
+/* UT Breado Sans Font */
 @font-face {
   font-family: 'UT Breado Sans';
   src: url('/ut breado demo/UT Breado Sans Demo/UT Breado Sans Demo.woff2') format('woff2'),
        url('/ut breado demo/UT Breado Sans Demo/UT Breado Sans Demo.woff') format('woff'),
        url('/ut breado demo/UT Breado Sans Demo/UT Breado Sans Demo.ttf') format('truetype');
-  font-weight: normal;
-  font-style: normal;
-  font-display: swap;
-}
-
-@font-face {
-  font-family: 'UT Breado Script';
-  src: url('/ut breado demo/UT Breado Script Demo/UT Breado Script Demo.woff2') format('woff2'),
-       url('/ut breado demo/UT Breado Script Demo/UT Breado Script Demo.woff') format('woff'),
-       url('/ut breado demo/UT Breado Script Demo/UT Breado Script Demo.ttf') format('truetype');
   font-weight: normal;
   font-style: normal;
   font-display: swap;
@@ -102,19 +92,19 @@
   --md3-hatching-3: var(--hatching-dense);
   --md3-hatching-4: var(--hatching-cross);
   
-  /* Typography Scale */
-  --md3-display-large: 57px;
-  --md3-display-medium: 45px;
-  --md3-display-small: 36px;
-  --md3-headline-large: 32px;
-  --md3-headline-medium: 28px;
-  --md3-headline-small: 24px;
-  --md3-title-large: 22px;
-  --md3-title-medium: 16px;
-  --md3-title-small: 14px;
-  --md3-body-large: 16px;
-  --md3-body-medium: 14px;
-  --md3-body-small: 12px;
+  /* Typography Scale - Larger Sizes */
+  --md3-display-large: 64px;
+  --md3-display-medium: 52px;
+  --md3-display-small: 42px;
+  --md3-headline-large: 38px;
+  --md3-headline-medium: 32px;
+  --md3-headline-small: 28px;
+  --md3-title-large: 26px;
+  --md3-title-medium: 20px;
+  --md3-title-small: 18px;
+  --md3-body-large: 18px;
+  --md3-body-medium: 16px;
+  --md3-body-small: 14px;
 }
 
 @media (prefers-color-scheme: dark) {
@@ -154,7 +144,7 @@ h1, h2, h3, h4, h5, h6, p, span, div {
   font-variant-ligatures: common-ligatures;
 }
 
-/* Material 3 Components with Helvetica and Hatching */
+/* Material 3 Components with UT Breado Sans and Hatching */
 .ankid-button {
   display: inline-flex;
   align-items: center;
@@ -162,7 +152,7 @@ h1, h2, h3, h4, h5, h6, p, span, div {
   padding: 12px 24px;
   border-radius: 16px;
   font-weight: 600;
-  font-size: 14px;
+  font-size: 16px;
   transition: all 200ms var(--md3-motion-easing-emphasized);
   background: var(--md3-primary);
   color: var(--md3-on-primary);
@@ -193,7 +183,7 @@ h1, h2, h3, h4, h5, h6, p, span, div {
   padding: 12px 24px;
   border-radius: 16px;
   font-weight: 600;
-  font-size: 14px;
+  font-size: 16px;
   transition: all 200ms var(--md3-motion-easing-emphasized);
   background: var(--md3-surface);
   color: var(--md3-on-surface);
@@ -284,7 +274,7 @@ h1, h2, h3, h4, h5, h6, p, span, div {
   align-items: center;
   padding: 4px 12px;
   border-radius: 9999px;
-  font-size: 12px;
+  font-size: 14px;
   font-weight: 600;
   background: var(--md3-secondary);
   color: var(--md3-on-secondary);
@@ -295,7 +285,7 @@ h1, h2, h3, h4, h5, h6, p, span, div {
 .ankid-nav-tab {
   padding: 8px 16px;
   border-radius: 9999px;
-  font-size: 14px;
+  font-size: 16px;
   font-weight: 500;
   transition: all 200ms var(--md3-motion-easing-emphasized);
   color: var(--md3-on-surface-variant);
@@ -311,7 +301,7 @@ h1, h2, h3, h4, h5, h6, p, span, div {
 }
 
 .ankid-section-title {
-  font-family: 'UT Breado Script', 'UT Breado Sans', 'Helvetica', 'Arial', sans-serif;
+  font-family: 'UT Breado Sans', 'Helvetica', 'Arial', sans-serif;
   font-size: var(--md3-headline-large);
   font-weight: 700;
   color: var(--md3-primary);
