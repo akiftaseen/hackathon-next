@@ -1637,23 +1637,26 @@ WRITING STYLE:
           </div>
           
           {/* Navigation */}
-          <div className="flex space-x-2 pb-4">
-            {[
-              { id: 'dashboard', label: 'Dashboard' },
-              { id: 'ai-chat', label: 'Teaching Assistant' },
-              { id: 'collection', label: 'Collection' },
-              { id: 'marketplace', label: 'Marketplace' },
-              { id: 'quests', label: 'Quests' },
-              { id: 'leaderboard', label: 'Leaderboard' }
-            ].map(nav => (
-              <button 
-                key={nav.id}
-                onClick={() => showSection(nav.id)} 
-                className={`ankid-nav-tab ${currentSection === nav.id ? 'active' : ''}`}
-              >
-                {nav.label}
-              </button>
-            ))}
+          <div className="ankid-nav">
+            <div className="flex flex-wrap justify-center gap-2">
+              {[
+                { id: 'dashboard', label: '🏠 Dashboard', shortLabel: '🏠' },
+                { id: 'ai-chat', label: '✨ AI Tutor', shortLabel: '✨' },
+                { id: 'collection', label: '📚 Collection', shortLabel: '📚' },
+                { id: 'marketplace', label: '🛒 Market', shortLabel: '🛒' },
+                { id: 'quests', label: '⚡ Quests', shortLabel: '⚡' },
+                { id: 'leaderboard', label: '🏆 Leaders', shortLabel: '🏆' }
+              ].map(nav => (
+                <button 
+                  key={nav.id}
+                  onClick={() => showSection(nav.id)} 
+                  className={`ankid-nav-button ${currentSection === nav.id ? 'active' : ''}`}
+                >
+                  <span className="hidden sm:inline">{nav.label}</span>
+                  <span className="sm:hidden text-2xl">{nav.shortLabel}</span>
+                </button>
+              ))}
+            </div>
           </div>
         </div>
       </div>

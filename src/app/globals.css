@@ -400,7 +400,7 @@ body {
   background: rgba(255, 255, 255, 0.95);
   backdrop-filter: blur(10px);
   border-radius: 24px;
-  padding: 0.5rem;
+  padding: 1rem;
   box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
   border: 1px solid rgba(69, 191, 219, 0.2);
   margin-bottom: 2rem;
@@ -409,25 +409,28 @@ body {
 .ankid-nav-button {
   background: transparent;
   border: none;
-  padding: 12px 24px;
-  border-radius: 20px;
+  padding: 10px 16px;
+  border-radius: 16px;
   font-weight: 600;
   cursor: pointer;
   transition: all 0.3s ease;
   color: var(--md3-on-surface-variant);
   font-family: 'Feather', 'Fredoka', sans-serif;
+  font-size: 0.9rem;
+  white-space: nowrap;
+  min-width: fit-content;
 }
 
 .ankid-nav-button:hover {
   background: rgba(69, 191, 219, 0.1);
   color: var(--md3-primary);
-  transform: scale(1.05);
+  transform: scale(1.02);
 }
 
 .ankid-nav-button.active {
-  background: linear-gradient(135deg, var(--md3-primary), var(--md3-secondary));
-  color: var(--md3-on-primary);
-  transform: scale(1.05);
+  background: var(--md3-primary);
+  color: white;
+  transform: scale(1.02);
   box-shadow: 0 4px 12px rgba(69, 191, 219, 0.3);
 }
 
@@ -439,6 +442,17 @@ body {
   
   .ankid-main {
     padding: 2rem; /* Reduced on mobile */
+  }
+  
+  .ankid-nav {
+    padding: 0.75rem;
+    margin-bottom: 1.5rem;
+  }
+  
+  .ankid-nav-button {
+    padding: 8px 12px;
+    font-size: 0.8rem;
+    border-radius: 12px;
   }
   
   .ankid-stats {
