@@ -839,14 +839,11 @@ export default function ANKIDApp() {
             <div className="flex items-center space-x-6">
               <h1 className="text-4xl font-bold m-0" 
                   style={{
-                    fontFamily: 'Helvetica, Arial, sans-serif',
+                    fontFamily: "'UT Breado Script', 'UT Breado Sans', 'Helvetica', 'Arial', sans-serif",
                     color: 'var(--md3-primary)'
                   }}>
                 ANKID
               </h1>
-              <div className="ankid-badge" style={{background: 'var(--md3-secondary-container)', color: 'var(--md3-on-secondary-container)'}}>
-                Gamified Learning Adventure
-              </div>
             </div>
             
             <div className="flex items-center space-x-3">
