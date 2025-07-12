@@ -770,7 +770,7 @@ export default function ANKIDApp() {
             <div>
               <h4 className="font-semibold mb-3" style={{color: 'var(--md3-on-surface)'}}>Background</h4>
               <div className="grid grid-cols-4 gap-3">
-                {['#45bfdb', '#f5dd59', '#ff6b9d', '#72777b'].map((color, index) => (
+                {['#1a237e', '#f8bbd9', '#e1bee7', '#72777b'].map((color, index) => (
                   <button key={index} className="w-12 h-12 rounded-lg border-2"
                           style={{background: color, borderColor: 'var(--md3-outline-variant)'}} />
                 ))}
