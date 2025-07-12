@@ -15,11 +15,11 @@ export default function RootLayout({
     <html lang="en">
       <head>
         <link
-          href="https://fonts.googleapis.com/css2?family=Feather:wght@300;400;700&display=swap"
+          href="https://fonts.googleapis.com/css2?family=Feather:wght@300;400;700&family=Fredoka:wght@400;500;600;700&display=swap"
           rel="stylesheet"
         />
       </head>
-      <body style={{ fontFamily: "'Feather', sans-serif", fontWeight: "700" }}>
+      <body style={{ fontFamily: "'Feather', 'Fredoka', sans-serif", fontWeight: "700" }}>
         {children}
       </body>
     </html>

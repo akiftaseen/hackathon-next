@@ -425,47 +425,57 @@ export default function ANKIDApp() {
     <div className="space-y-8">
       <div className="ankid-paper p-8">
         <div className="text-center">
-          <h2 className="ankid-section-title">Welcome back, Scholar!</h2>
-          <p className="ankid-section-subtitle">Ready to continue your learning adventure?</p>
+          <h2 className="ankid-section-title">
+            <span className="fun-emoji">🎓</span> Welcome back, Scholar! <span className="fun-emoji">✨</span>
+          </h2>
+          <p className="ankid-section-subtitle">Ready to continue your learning adventure? <span className="fun-emoji">🚀</span></p>
           
           <div className="grid grid-cols-2 md:grid-cols-4 gap-6 mt-8">
-            <div className="text-center">
-              <div className="w-16 h-16 mx-auto mb-2 rounded-full flex items-center justify-center text-white text-xl font-bold" 
-                   style={{background: 'var(--md3-primary)'}}>
-                {userStats.level}
+            <div className="text-center group">
+              <div className="w-16 h-16 mx-auto mb-2 rounded-full flex items-center justify-center text-white text-xl font-bold transition-all duration-300 group-hover:scale-110" 
+                   style={{background: 'linear-gradient(135deg, var(--md3-primary) 0%, var(--md3-tertiary) 100%)'}}>
+                <span className="fun-emoji">{userStats.level}</span>
               </div>
-              <p className="text-sm font-medium" style={{color: 'var(--md3-on-surface-variant)'}}>Level</p>
+              <p className="text-sm font-bold" style={{color: 'var(--md3-on-surface-variant)'}}>
+                Level <span className="fun-emoji">📈</span>
+              </p>
             </div>
             
-            <div className="text-center">
-              <div className="w-16 h-16 mx-auto mb-2 rounded-full flex items-center justify-center"
-                   style={{background: 'var(--md3-secondary)'}}>
-                <Flame size={28} color="black" />
+            <div className="text-center group">
+              <div className="w-16 h-16 mx-auto mb-2 rounded-full flex items-center justify-center transition-all duration-300 group-hover:scale-110 group-hover:rotate-12"
+                   style={{background: 'linear-gradient(135deg, var(--md3-secondary) 0%, var(--md3-tertiary) 100%)'}}>
+                <Flame size={28} className="fun-icon" style={{color: '#ff4444'}} />
               </div>
-              <p className="text-sm font-medium" style={{color: 'var(--md3-on-surface-variant)'}}>{userStats.streak} Day Streak</p>
+              <p className="text-sm font-bold" style={{color: 'var(--md3-on-surface-variant)'}}>
+                {userStats.streak} Day Streak <span className="fun-emoji">🔥</span>
+              </p>
             </div>
             
-            <div className="text-center">
-              <div className="w-16 h-16 mx-auto mb-2 rounded-full flex items-center justify-center"
-                   style={{background: 'var(--md3-primary)'}}>
-                <Gem size={28} color="white" />
+            <div className="text-center group">
+              <div className="w-16 h-16 mx-auto mb-2 rounded-full flex items-center justify-center transition-all duration-300 group-hover:scale-110 group-hover:rotate-12"
+                   style={{background: 'linear-gradient(135deg, var(--md3-primary) 0%, var(--md3-secondary) 100%)'}}>
+                <Gem size={28} className="fun-icon" color="white" />
               </div>
-              <p className="text-sm font-medium" style={{color: 'var(--md3-on-surface-variant)'}}>{userStats.gems} Gems</p>
+              <p className="text-sm font-bold" style={{color: 'var(--md3-on-surface-variant)'}}>
+                {userStats.gems} Gems <span className="fun-emoji">💎</span>
+              </p>
             </div>
             
-            <div className="text-center">
-              <div className="w-16 h-16 mx-auto mb-2 rounded-full flex items-center justify-center"
-                   style={{background: 'var(--md3-secondary)'}}>
-                <Layers size={28} color="black" />
+            <div className="text-center group">
+              <div className="w-16 h-16 mx-auto mb-2 rounded-full flex items-center justify-center transition-all duration-300 group-hover:scale-110"
+                   style={{background: 'linear-gradient(135deg, var(--md3-secondary) 0%, var(--md3-primary) 100%)'}}>
+                <Layers size={28} className="fun-icon" color="white" />
               </div>
-              <p className="text-sm font-medium" style={{color: 'var(--md3-on-surface-variant)'}}>{userStats.totalCards} Cards</p>
+              <p className="text-sm font-bold" style={{color: 'var(--md3-on-surface-variant)'}}>
+                {userStats.totalCards} Cards <span className="fun-emoji">📚</span>
+              </p>
             </div>
           </div>
           
           <div className="mt-8">
             <div className="flex justify-between text-sm mb-2" style={{color: 'var(--md3-on-surface-variant)'}}>
-              <span>Level {userStats.level}</span>
-              <span>{userStats.xpToNext} XP to next level</span>
+              <span className="font-bold">Level {userStats.level} <span className="fun-emoji">⭐</span></span>
+              <span className="font-bold">{userStats.xpToNext} XP to next level <span className="fun-emoji">🎯</span></span>
             </div>
             <div className="ankid-progress-bar">
               <div 
@@ -478,58 +488,74 @@ export default function ANKIDApp() {
       </div>
 
       <div className="grid md:grid-cols-2 gap-6">
-        <div className="ankid-card">
+        <div className="ankid-card group">
           <div className="flex items-center space-x-4">
-            <div className="w-12 h-12 rounded-xl flex items-center justify-center"
-                 style={{background: 'var(--md3-primary-container)'}}>
-              <BookOpen size={24} style={{color: 'var(--md3-primary)'}} />
+            <div className="w-12 h-12 rounded-xl flex items-center justify-center transition-all duration-300 group-hover:scale-110 group-hover:rotate-12"
+                 style={{background: 'linear-gradient(135deg, var(--md3-primary) 0%, var(--md3-tertiary) 100%)'}}>
+              <BookOpen size={24} className="fun-icon" color="white" />
             </div>
             <div className="flex-1">
-              <h3 className="font-semibold" style={{color: 'var(--md3-on-surface)'}}>Continue Studying</h3>
-              <p className="text-sm" style={{color: 'var(--md3-on-surface-variant)'}}>Pick up where you left off</p>
+              <h3 className="font-bold text-lg" style={{color: 'var(--md3-on-surface)'}}>
+                Continue Studying <span className="fun-emoji">📖</span>
+              </h3>
+              <p className="text-sm font-medium" style={{color: 'var(--md3-on-surface-variant)'}}>
+                Pick up where you left off! <span className="fun-emoji">🎯</span>
+              </p>
             </div>
           </div>
           <button onClick={() => showSection('study')} className="ankid-button w-full mt-4">
-            Start Session
+            <span className="fun-emoji">🚀</span> Start Session <span className="fun-emoji">✨</span>
           </button>
         </div>
         
-        <div className="ankid-card">
+        <div className="ankid-card group">
           <div className="flex items-center space-x-4">
-            <div className="w-12 h-12 rounded-xl flex items-center justify-center"
-                 style={{background: 'var(--md3-secondary-container)'}}>
-              <Plus size={24} style={{color: 'var(--md3-secondary)'}} />
+            <div className="w-12 h-12 rounded-xl flex items-center justify-center transition-all duration-300 group-hover:scale-110 group-hover:rotate-12"
+                 style={{background: 'linear-gradient(135deg, var(--md3-secondary) 0%, var(--md3-tertiary) 100%)'}}>
+              <Plus size={24} className="fun-icon" color="white" />
             </div>
             <div className="flex-1">
-              <h3 className="font-semibold" style={{color: 'var(--md3-on-surface)'}}>Create Cards</h3>
-              <p className="text-sm" style={{color: 'var(--md3-on-surface-variant)'}}>Add new knowledge to your collection</p>
+              <h3 className="font-bold text-lg" style={{color: 'var(--md3-on-surface)'}}>
+                Create Cards <span className="fun-emoji">✨</span>
+              </h3>
+              <p className="text-sm font-medium" style={{color: 'var(--md3-on-surface-variant)'}}>
+                Add new knowledge to your collection! <span className="fun-emoji">📝</span>
+              </p>
             </div>
           </div>
           <button onClick={() => showSection('collection')} className="ankid-button-secondary w-full mt-4">
-            Create New
+            <span className="fun-emoji">🎨</span> Create New <span className="fun-emoji">💫</span>
           </button>
         </div>
       </div>
 
       <div className="ankid-paper p-8">
-        <h3 className="ankid-section-title">Today's Progress</h3>
+        <h3 className="ankid-section-title">
+          <span className="fun-emoji">📊</span> Today's Progress <span className="fun-emoji">🎉</span>
+        </h3>
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-6">
           {[
-            { icon: Zap, label: '15 Cards Studied', progress: 75, color: 'var(--md3-primary)' },
-            { icon: Trophy, label: '2 Quests Complete', progress: 100, color: 'var(--md3-secondary)' },
-            { icon: Sparkles, label: '150 XP Earned', progress: 60, color: 'var(--md3-tertiary)' },
-            { icon: Flame, label: 'Streak Maintained', progress: 100, color: 'var(--md3-secondary)' }
+            { icon: Zap, label: '15 Cards Studied', progress: 75, color: 'var(--md3-primary)', emoji: '⚡' },
+            { icon: Trophy, label: '2 Quests Complete', progress: 100, color: 'var(--md3-secondary)', emoji: '🏆' },
+            { icon: Sparkles, label: '150 XP Earned', progress: 60, color: 'var(--md3-tertiary)', emoji: '✨' },
+            { icon: Flame, label: 'Streak Maintained', progress: 100, color: 'var(--md3-secondary)', emoji: '🔥' }
           ].map((item, index) => (
-            <div key={index} className="text-center p-4 rounded-xl border" 
+            <div key={index} className="text-center p-4 rounded-xl border transition-all duration-300 hover:scale-105 hover:rotate-1 group" 
                  style={{
                    background: 'var(--md3-surface-container)',
                    borderColor: 'var(--md3-outline-variant)'
                  }}>
-              <item.icon size={32} style={{color: item.color}} className="mx-auto mb-2" />
-              <p className="text-sm font-medium" style={{color: 'var(--md3-on-surface)'}}>{item.label}</p>
-              <div className="ankid-progress-bar mt-2 h-1">
+              <div className="flex items-center justify-center mb-2">
+                <item.icon size={32} style={{color: item.color}} className="fun-icon mr-2" />
+                <span className="text-2xl fun-emoji">{item.emoji}</span>
+              </div>
+              <p className="text-sm font-bold" style={{color: 'var(--md3-on-surface)'}}>{item.label}</p>
+              <div className="ankid-progress-bar mt-2 h-2">
                 <div className="ankid-progress-fill" style={{width: `${item.progress}%`}} />
               </div>
+              <p className="text-xs font-bold mt-1" style={{color: 'var(--md3-primary)'}}>
+                {item.progress}% Complete! {item.progress === 100 ? '🎉' : '💪'}
+              </p>
             </div>
           ))}
         </div>
@@ -915,8 +941,12 @@ WRITING STYLE:
     return (
       <div className="max-w-4xl mx-auto flex flex-col h-screen" style={{ height: 'calc(100vh - 120px)', maxHeight: '800px' }}>
         <div className="ankid-paper p-6 mb-6 flex-shrink-0">
-          <h2 className="ankid-section-title">Your Teaching Assistant</h2>
-          <p className="ankid-section-subtitle">I'm your teacher who wants to learn from YOU! Teach me something today.</p>
+          <h2 className="ankid-section-title">
+            <span className="fun-emoji">🤖</span> Your Teaching Assistant <span className="fun-emoji">🎓</span>
+          </h2>
+          <p className="ankid-section-subtitle">
+            I'm your teacher who wants to learn from YOU! <span className="fun-emoji">🌟</span> Teach me something today. <span className="fun-emoji">🚀</span>
+          </p>
           
           {/* Voice Selector */}
           {availableVoices.length > 0 && (
@@ -990,38 +1020,44 @@ WRITING STYLE:
         >
           {showRating && conversationRating ? (
             /* Rating Display */
-            <div className="space-y-6">
+            <div className="space-y-6 animate-bounce-in">
               <div className="text-center">
-                <h3 className="text-2xl font-bold mb-4" style={{color: 'var(--md3-primary)'}}>
-                  🎓 Conversation Complete!
+                <h3 className="text-2xl font-bold mb-4 animate-wiggle" style={{color: 'var(--md3-primary)'}}>
+                  <span className="fun-emoji">🎓</span> Conversation Complete! <span className="fun-emoji">✨</span>
                 </h3>
                 
                 {/* Score Display */}
                 <div className="mb-6">
-                  <div className="inline-flex items-center justify-center w-24 h-24 rounded-full text-3xl font-bold text-white mb-4"
+                  <div className="inline-flex items-center justify-center w-24 h-24 rounded-full text-3xl font-bold text-white mb-4 shadow-lg transform hover:scale-110 transition-all duration-300 animate-glow-pulse"
                        style={{
-                         background: conversationRating.score >= 8 ? '#4CAF50' : 
-                                    conversationRating.score >= 6 ? '#FF9800' : 
-                                    conversationRating.score >= 4 ? '#FFC107' : '#F44336'
+                         background: conversationRating.score >= 8 ? 'linear-gradient(135deg, #4CAF50, #8BC34A)' : 
+                                    conversationRating.score >= 6 ? 'linear-gradient(135deg, #FF9800, #FFC107)' : 
+                                    conversationRating.score >= 4 ? 'linear-gradient(135deg, #FFC107, #FFEB3B)' : 'linear-gradient(135deg, #F44336, #E91E63)'
                        }}>
                     {conversationRating.score}/10
+                    <span className="fun-emoji ml-1">
+                      {conversationRating.score >= 8 ? '🌟' : 
+                       conversationRating.score >= 6 ? '👍' : 
+                       conversationRating.score >= 4 ? '👌' : '💪'}
+                    </span>
                   </div>
-                  <p className="text-lg" style={{color: 'var(--md3-on-surface)'}}>
-                    {conversationRating.feedback}
+                  <p className="text-lg animate-float" style={{color: 'var(--md3-on-surface)'}}>
+                    <span className="fun-emoji">💭</span> {conversationRating.feedback} <span className="fun-emoji">💡</span>
                   </p>
                 </div>
 
                 {/* Strengths */}
-                <div className="mb-6 p-4 rounded-lg" style={{background: 'var(--md3-secondary-container)'}}>
-                  <h4 className="text-lg font-bold mb-3 flex items-center justify-center" 
+                <div className="mb-6 p-4 rounded-lg shadow-lg hover:shadow-green-300 transition-all duration-300 transform hover:scale-105 animate-bounce-in" 
+                     style={{background: 'linear-gradient(135deg, var(--md3-secondary-container), #bbf7d0)'}}>
+                  <h4 className="text-lg font-bold mb-3 flex items-center justify-center animate-wiggle" 
                       style={{color: 'var(--md3-on-secondary-container)'}}>
-                    ⭐ Your Strengths
+                    <span className="fun-emoji mr-2">⭐</span> Your Strengths <span className="fun-emoji ml-2">💪</span>
                   </h4>
                   <ul className="space-y-2">
                     {conversationRating.strengths.map((strength, index) => (
-                      <li key={index} className="flex items-center text-sm"
+                      <li key={index} className="flex items-center text-sm hover:bg-green-100 p-2 rounded transition-all duration-200"
                           style={{color: 'var(--md3-on-secondary-container)'}}>
-                        <span className="mr-2">✅</span>
+                        <span className="mr-2 fun-emoji">✅</span>
                         {strength}
                       </li>
                     ))}
@@ -1029,16 +1065,17 @@ WRITING STYLE:
                 </div>
 
                 {/* Areas for Improvement */}
-                <div className="mb-6 p-4 rounded-lg" style={{background: 'var(--md3-tertiary-container)'}}>
-                  <h4 className="text-lg font-bold mb-3 flex items-center justify-center"
+                <div className="mb-6 p-4 rounded-lg shadow-lg hover:shadow-yellow-300 transition-all duration-300 transform hover:scale-105 animate-bounce-in" 
+                     style={{background: 'linear-gradient(135deg, var(--md3-tertiary-container), #fef3c7)'}}>
+                  <h4 className="text-lg font-bold mb-3 flex items-center justify-center animate-wiggle"
                       style={{color: 'var(--md3-on-tertiary-container)'}}>
-                    🚀 Ways to Improve
+                    <span className="fun-emoji mr-2">🚀</span> Ways to Improve <span className="fun-emoji ml-2">📈</span>
                   </h4>
                   <ul className="space-y-2">
                     {conversationRating.improvements.map((improvement, index) => (
-                      <li key={index} className="flex items-center text-sm"
+                      <li key={index} className="flex items-center text-sm hover:bg-yellow-100 p-2 rounded transition-all duration-200"
                           style={{color: 'var(--md3-on-tertiary-container)'}}>
-                        <span className="mr-2">💡</span>
+                        <span className="mr-2 fun-emoji">💡</span>
                         {improvement}
                       </li>
                     ))}
@@ -1049,15 +1086,15 @@ WRITING STYLE:
                 <div className="flex space-x-4 justify-center">
                   <button
                     onClick={startNewConversation}
-                    className="ankid-button px-6 py-3"
+                    className="ankid-button px-6 py-3 transform hover:scale-105 transition-all duration-300 shadow-lg hover:shadow-cyan-300 animate-bounce-in"
                   >
-                    🔄 Start New Conversation
+                    <span className="fun-emoji mr-2">🔄</span> Start New Conversation <span className="fun-emoji ml-2">✨</span>
                   </button>
                   <button
                     onClick={() => setShowRating(false)}
-                    className="ankid-button-secondary px-6 py-3"
+                    className="ankid-button-secondary px-6 py-3 transform hover:scale-105 transition-all duration-300 shadow-lg hover:shadow-yellow-300 animate-bounce-in"
                   >
-                    📖 Review Conversation
+                    <span className="fun-emoji mr-2">📖</span> Review Conversation <span className="fun-emoji ml-2">👀</span>
                   </button>
                 </div>
               </div>
@@ -1066,20 +1103,27 @@ WRITING STYLE:
             /* Regular Chat Messages */
             <div className="space-y-4">
               {chatMessages.map((message, index) => (
-                <div key={index} className={`flex ${message.role === 'user' ? 'justify-end' : 'justify-start'}`}>
+                <div key={index} className={`flex ${message.role === 'user' ? 'justify-end' : 'justify-start'} animate-bounce-in`}>
                   <div
-                    className={`max-w-[80%] p-4 rounded-2xl ${
+                    className={`max-w-[80%] p-4 rounded-2xl shadow-lg transform hover:scale-105 transition-all duration-300 ${
                       message.role === 'user'
-                        ? 'ml-4'
-                        : 'mr-4'
+                        ? 'ml-4 hover:shadow-cyan-300'
+                        : 'mr-4 hover:shadow-yellow-300'
                     }`}
                     style={{
-                      background: message.role === 'user' ? 'var(--md3-primary)' : 'var(--md3-secondary-container)',
+                      background: message.role === 'user' 
+                        ? 'linear-gradient(135deg, var(--md3-primary), #0891b2)' 
+                        : 'linear-gradient(135deg, var(--md3-secondary-container), #fbbf24)',
                       color: message.role === 'user' ? 'var(--md3-on-primary)' : 'var(--md3-on-secondary-container)'
                     }}
                   >
                     <div className="flex items-start justify-between">
-                      <p className="mb-2 whitespace-pre-wrap flex-1">{message.content}</p>
+                      <div className="flex items-start space-x-2 flex-1">
+                        <span className="fun-emoji text-lg">
+                          {message.role === 'user' ? '🧠' : '🤖'}
+                        </span>
+                        <p className="mb-2 whitespace-pre-wrap flex-1">{message.content}</p>
+                      </div>
                       {message.role === 'assistant' && (
                         <button
                           onClick={() => speakText(message.content)}
@@ -1099,27 +1143,37 @@ WRITING STYLE:
               ))}
               
               {isLoading && (
-                <div className="flex justify-start">
-                  <div className="mr-4 p-4 rounded-2xl" style={{background: 'var(--md3-secondary-container)'}}>
-                    <div className="flex space-x-1">
-                      <div className="w-2 h-2 bg-current rounded-full animate-bounce"></div>
-                      <div className="w-2 h-2 bg-current rounded-full animate-bounce" style={{animationDelay: '0.1s'}}></div>
-                      <div className="w-2 h-2 bg-current rounded-full animate-bounce" style={{animationDelay: '0.2s'}}></div>
+                <div className="flex justify-start animate-bounce-in">
+                  <div className="mr-4 p-4 rounded-2xl shadow-lg hover:shadow-yellow-300 transition-all duration-300" 
+                       style={{background: 'linear-gradient(135deg, var(--md3-secondary-container), #fbbf24)'}}>
+                    <div className="flex items-center space-x-2">
+                      <span className="fun-emoji">🤖</span>
+                      <div className="flex space-x-1">
+                        <div className="w-2 h-2 bg-current rounded-full animate-bounce"></div>
+                        <div className="w-2 h-2 bg-current rounded-full animate-bounce" style={{animationDelay: '0.1s'}}></div>
+                        <div className="w-2 h-2 bg-current rounded-full animate-bounce" style={{animationDelay: '0.2s'}}></div>
+                      </div>
+                      <span className="text-sm opacity-70">Thinking...</span>
                     </div>
                   </div>
                 </div>
               )}
 
               {isGeneratingRating && (
-                <div className="flex justify-center">
-                  <div className="p-4 rounded-2xl text-center" style={{background: 'var(--md3-primary-container)'}}>
-                    <div className="flex items-center space-x-2 mb-2">
-                      <div className="w-4 h-4 bg-current rounded-full animate-bounce"></div>
-                      <div className="w-4 h-4 bg-current rounded-full animate-bounce" style={{animationDelay: '0.1s'}}></div>
-                      <div className="w-4 h-4 bg-current rounded-full animate-bounce" style={{animationDelay: '0.2s'}}></div>
+                <div className="flex justify-center animate-bounce-in">
+                  <div className="p-4 rounded-2xl text-center shadow-lg hover:shadow-cyan-300 transition-all duration-300" 
+                       style={{background: 'linear-gradient(135deg, var(--md3-primary-container), #0891b2)'}}>
+                    <div className="flex items-center justify-center space-x-2 mb-2">
+                      <span className="fun-emoji animate-wiggle">🎓</span>
+                      <div className="flex space-x-1">
+                        <div className="w-4 h-4 bg-current rounded-full animate-bounce"></div>
+                        <div className="w-4 h-4 bg-current rounded-full animate-bounce" style={{animationDelay: '0.1s'}}></div>
+                        <div className="w-4 h-4 bg-current rounded-full animate-bounce" style={{animationDelay: '0.2s'}}></div>
+                      </div>
+                      <span className="fun-emoji animate-wiggle">📊</span>
                     </div>
                     <p style={{color: 'var(--md3-on-primary-container)'}}>
-                      🎓 Analyzing your conversation and generating rating...
+                      <span className="fun-emoji">✨</span> Analyzing your conversation and generating rating... <span className="fun-emoji">✨</span>
                     </p>
                   </div>
                 </div>
@@ -1137,40 +1191,56 @@ WRITING STYLE:
                 <button
                   onClick={endConversation}
                   disabled={isGeneratingRating || isLoading}
-                  className="px-6 py-3 bg-purple-500 text-white rounded-lg font-bold hover:bg-purple-600 disabled:opacity-50 transition-colors"
-                  style={{ fontFamily: "'Feather', sans-serif", fontWeight: "700" }}
+                  className="px-6 py-3 bg-gradient-to-r from-purple-500 to-pink-500 text-white rounded-lg font-bold hover:shadow-purple-300 disabled:opacity-50 transition-all duration-300 shadow-lg transform hover:scale-105 animate-glow-pulse"
+                  style={{ fontFamily: "'Feather', 'Fredoka', sans-serif", fontWeight: "700" }}
                 >
-                  {isGeneratingRating ? '📊 Generating Rating...' : '🏁 End Conversation & Get Rating'}
+                  {isGeneratingRating ? (
+                    <>
+                      <span className="fun-emoji animate-wiggle mr-2">📊</span> 
+                      Generating Rating... 
+                      <span className="fun-emoji animate-wiggle ml-2">✨</span>
+                    </>
+                  ) : (
+                    <>
+                      <span className="fun-emoji mr-2">🏁</span> 
+                      End Conversation & Get Rating 
+                      <span className="fun-emoji ml-2">🎓</span>
+                    </>
+                  )}
                 </button>
               </div>
             )}
 
             {/* Voice Input Section */}
             {!showRating && (
-              <div className="flex space-x-3">
+              <div className="flex space-x-3 p-4 bg-gradient-to-r from-cyan-50 to-pink-50 rounded-lg border border-pink-200 shadow-lg">
                 <input
                   type="text"
                   value={currentMessage}
                   onChange={(e) => setCurrentMessage(e.target.value)}
                   onKeyPress={(e) => e.key === 'Enter' && !isLoading && sendMessage()}
-                  placeholder="Type your question or use voice input..."
-                  className="flex-1 p-4 border-2 border-gray-300 rounded-lg text-lg"
+                  placeholder="💭 Type your question or use voice input... ✨"
+                  className="flex-1 p-4 border-2 border-gradient-to-r from-cyan-300 to-pink-300 rounded-lg text-lg shadow-inner hover:shadow-lg transition-all duration-300 focus:ring-4 focus:ring-cyan-200 focus:border-cyan-400"
                   disabled={isLoading || isListening}
-                  style={{ fontFamily: "'Feather', sans-serif", fontWeight: "700" }}
+                  style={{ 
+                    fontFamily: "'Feather', 'Fredoka', sans-serif", 
+                    fontWeight: "700",
+                    background: 'linear-gradient(135deg, #ffffff, #f0f9ff)'
+                  }}
                 />
                 
                 {/* Voice Input Button */}
                 <button
                   onClick={isListening ? stopListening : startListening}
                   disabled={isLoading || isSpeaking || !speechSupported || isStartingListening}
-                  className={`px-6 py-4 rounded-lg font-bold transition-colors text-lg ${
+                  className={`px-6 py-4 rounded-lg font-bold transition-all duration-300 text-lg shadow-lg transform hover:scale-105 ${
                     !speechSupported 
                       ? 'bg-gray-400 text-white cursor-not-allowed'
                       : isStartingListening
-                      ? 'bg-yellow-500 text-white cursor-wait'
+                      ? 'bg-gradient-to-r from-yellow-400 to-orange-400 text-white cursor-wait animate-pulse'
                       : isListening 
-                      ? 'bg-red-500 text-white hover:bg-red-600' 
-                      : 'bg-blue-500 text-white hover:bg-blue-600'
+                      ? 'bg-gradient-to-r from-red-500 to-pink-500 text-white hover:shadow-red-300 animate-wiggle' 
+                      : 'bg-gradient-to-r from-blue-500 to-purple-500 text-white hover:shadow-blue-300'
                   }`}
                   title={
                     !speechSupported 
@@ -1181,7 +1251,7 @@ WRITING STYLE:
                       ? 'Stop listening' 
                       : 'Start voice input'
                   }
-                  style={{ fontFamily: "'Feather', sans-serif", fontWeight: "700" }}
+                  style={{ fontFamily: "'Feather', 'Fredoka', sans-serif", fontWeight: "700" }}
                 >
                   {!speechSupported 
                     ? '🚫 No Mic' 
@@ -1197,10 +1267,10 @@ WRITING STYLE:
                 <button
                   onClick={sendMessage}
                   disabled={isLoading || !currentMessage.trim() || isListening}
-                  className="px-8 py-4 bg-green-500 text-white rounded-lg font-bold hover:bg-green-600 disabled:opacity-50 transition-colors text-lg"
-                  style={{ fontFamily: "'Feather', sans-serif", fontWeight: "700" }}
+                  className="px-8 py-4 bg-gradient-to-r from-green-500 to-emerald-500 text-white rounded-lg font-bold hover:shadow-green-300 disabled:opacity-50 transition-all duration-300 text-lg shadow-lg transform hover:scale-105"
+                  style={{ fontFamily: "'Feather', 'Fredoka', sans-serif", fontWeight: "700" }}
                 >
-                  {isLoading ? '🤔 Thinking...' : '📤 Send'}
+                  {isLoading ? '🤔 Thinking...' : '� Send'}
                 </button>
               </div>
             )}
