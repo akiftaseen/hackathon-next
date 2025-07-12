@@ -100,11 +100,11 @@
   --md3-headline-medium: 32px;
   --md3-headline-small: 28px;
   --md3-title-large: 26px;
-  --md3-title-medium: 20px;
-  --md3-title-small: 18px;
-  --md3-body-large: 18px;
-  --md3-body-medium: 16px;
-  --md3-body-small: 14px;
+  --md3-title-medium: 22px;
+  --md3-title-small: 20px;
+  --md3-body-large: 20px;
+  --md3-body-medium: 18px;
+  --md3-body-small: 16px;
 }
 
 @media (prefers-color-scheme: dark) {
@@ -130,6 +130,19 @@ body {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   text-rendering: optimizeLegibility;
+  padding: 0 16px;
+}
+
+@media (min-width: 768px) {
+  body {
+    padding: 0 32px;
+  }
+}
+
+@media (min-width: 1024px) {
+  body {
+    padding: 0 64px;
+  }
 }
 
 /* Prevent font clipping */
@@ -152,7 +165,7 @@ h1, h2, h3, h4, h5, h6, p, span, div {
   padding: 12px 24px;
   border-radius: 16px;
   font-weight: 600;
-  font-size: 16px;
+  font-size: 18px;
   transition: all 200ms var(--md3-motion-easing-emphasized);
   background: var(--md3-primary);
   color: var(--md3-on-primary);
@@ -183,7 +196,7 @@ h1, h2, h3, h4, h5, h6, p, span, div {
   padding: 12px 24px;
   border-radius: 16px;
   font-weight: 600;
-  font-size: 16px;
+  font-size: 18px;
   transition: all 200ms var(--md3-motion-easing-emphasized);
   background: var(--md3-surface);
   color: var(--md3-on-surface);
@@ -260,6 +273,7 @@ h1, h2, h3, h4, h5, h6, p, span, div {
   color: var(--md3-on-surface);
   font-family: 'UT Breado Sans', 'Helvetica', 'Arial', sans-serif;
   line-height: 1.5;
+  font-size: 18px;
 }
 
 .ankid-input:focus {
@@ -274,7 +288,7 @@ h1, h2, h3, h4, h5, h6, p, span, div {
   align-items: center;
   padding: 4px 12px;
   border-radius: 9999px;
-  font-size: 14px;
+  font-size: 16px;
   font-weight: 600;
   background: var(--md3-secondary);
   color: var(--md3-on-secondary);
@@ -285,7 +299,7 @@ h1, h2, h3, h4, h5, h6, p, span, div {
 .ankid-nav-tab {
   padding: 8px 16px;
   border-radius: 9999px;
-  font-size: 16px;
+  font-size: 18px;
   font-weight: 500;
   transition: all 200ms var(--md3-motion-easing-emphasized);
   color: var(--md3-on-surface-variant);

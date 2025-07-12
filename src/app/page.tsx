@@ -834,7 +834,7 @@ export default function ANKIDApp() {
     <div className="min-h-screen" style={{background: 'var(--md3-background)'}}>
       {/* Header */}
       <div className="border-b-2" style={{borderColor: 'var(--md3-outline-variant)'}}>
-        <div className="max-w-7xl mx-auto px-4">
+        <div className="max-w-5xl mx-auto px-8">
           <div className="flex items-center justify-between py-4">
             <div className="flex items-center space-x-6">
               <h1 className="text-4xl font-bold m-0" 
@@ -898,7 +898,7 @@ export default function ANKIDApp() {
       </div>
 
       {/* Main Content */}
-      <div className="max-w-7xl mx-auto px-4 py-8">
+      <div className="max-w-5xl mx-auto px-8 py-8">
         {renderCurrentSection()}
       </div>
     </div>
