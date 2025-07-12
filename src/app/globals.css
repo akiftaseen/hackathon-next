@@ -30,42 +30,42 @@
   --md3-background: #ffffff;
   --md3-on-background: #000000;
   
-  /* Hatching Patterns - Subtle for better readability */
+  /* Hatching Patterns - Gray for shadows only */
   --hatching-light: repeating-linear-gradient(
     45deg,
     transparent,
     transparent 8px,
-    var(--md3-outline-variant) 8px,
-    var(--md3-outline-variant) 8.5px
+    #cccccc 8px,
+    #cccccc 8.5px
   );
   --hatching-medium: repeating-linear-gradient(
     45deg,
     transparent,
     transparent 6px,
-    var(--md3-outline-variant) 6px,
-    var(--md3-outline-variant) 6.5px
+    #999999 6px,
+    #999999 6.5px
   );
   --hatching-dense: repeating-linear-gradient(
     45deg,
     transparent,
     transparent 4px,
-    var(--md3-outline) 4px,
-    var(--md3-outline) 4.5px
+    #666666 4px,
+    #666666 4.5px
   );
   --hatching-cross: 
     repeating-linear-gradient(
       45deg,
       transparent,
       transparent 10px,
-      var(--md3-outline-variant) 10px,
-      var(--md3-outline-variant) 10.5px
+      #cccccc 10px,
+      #cccccc 10.5px
     ),
     repeating-linear-gradient(
       -45deg,
       transparent,
       transparent 10px,
-      var(--md3-outline-variant) 10px,
-      var(--md3-outline-variant) 10.5px
+      #cccccc 10px,
+      #cccccc 10.5px
     );
   
   /* Motion Variables */
@@ -98,26 +98,26 @@
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --md3-surface: #121212;
-    --md3-surface-variant: #1e1e1e;
-    --md3-surface-container: #1a1a1a;
-    --md3-surface-container-high: #2a2a2a;
-    --md3-on-surface: #e3e3e3;
-    --md3-on-surface-variant: #c7c7c7;
-    --md3-outline: #8c8c8c;
-    --md3-outline-variant: #444444;
-    --md3-background: #121212;
-    --md3-on-background: #e3e3e3;
+    --md3-surface: #000000;
+    --md3-surface-variant: #000000;
+    --md3-surface-container: #000000;
+    --md3-surface-container-high: #000000;
+    --md3-on-surface: #ffffff;
+    --md3-on-surface-variant: #ffffff;
+    --md3-outline: #45bfdb;
+    --md3-outline-variant: #b8e6f0;
+    --md3-background: #000000;
+    --md3-on-background: #ffffff;
   }
 }
 
 body {
   background: var(--md3-background);
   color: var(--md3-on-background);
-  font-family: 'Inter', system-ui, sans-serif;
+  font-family: 'Helvetica', 'Arial', sans-serif;
 }
 
-/* Material 3 Expressive Components */
+/* Material 3 Components with Helvetica and Hatching */
 .ankid-button {
   display: inline-flex;
   align-items: center;
@@ -133,7 +133,7 @@ body {
   cursor: pointer;
   position: relative;
   overflow: hidden;
-  font-family: 'Inter', sans-serif;
+  font-family: 'Helvetica', 'Arial', sans-serif;
   transform: translateZ(0);
 }
 
@@ -157,13 +157,13 @@ body {
   font-weight: 600;
   font-size: 14px;
   transition: all 200ms var(--md3-motion-easing-emphasized);
-  background: var(--md3-surface-variant);
+  background: var(--md3-surface);
   color: var(--md3-on-surface);
-  border: 2px solid var(--md3-outline-variant);
+  border: 2px solid var(--md3-primary);
   cursor: pointer;
   position: relative;
   overflow: hidden;
-  font-family: 'Inter', sans-serif;
+  font-family: 'Helvetica', 'Arial', sans-serif;
   transform: translateZ(0);
 }
 
@@ -171,8 +171,8 @@ body {
   border-radius: 24px;
   padding: 24px;
   transition: all 300ms var(--md3-motion-easing-emphasized);
-  background: var(--md3-surface-container);
-  border: 2px solid var(--md3-outline-variant);
+  background: var(--md3-surface);
+  border: 2px solid var(--md3-primary);
   position: relative;
   transform: translateZ(0);
 }
@@ -203,7 +203,7 @@ body {
   border-radius: 24px;
   transition: all 300ms var(--md3-motion-easing-emphasized);
   background: var(--md3-surface);
-  border: 2px solid var(--md3-outline-variant);
+  border: 2px solid var(--md3-primary);
   position: relative;
   overflow: hidden;
 }
@@ -225,11 +225,11 @@ body {
   width: 100%;
   padding: 16px 24px;
   border-radius: 16px;
-  border: 2px solid var(--md3-outline-variant);
+  border: 2px solid var(--md3-primary);
   transition: all 300ms var(--md3-motion-easing-emphasized);
-  background: var(--md3-surface-variant);
+  background: var(--md3-surface);
   color: var(--md3-on-surface);
-  font-family: 'Inter', sans-serif;
+  font-family: 'Helvetica', 'Arial', sans-serif;
 }
 
 .ankid-input:focus {
@@ -246,9 +246,9 @@ body {
   border-radius: 9999px;
   font-size: 12px;
   font-weight: 600;
-  background: var(--md3-primary-container);
-  color: var(--md3-on-primary-container);
-  font-family: 'Inter', sans-serif;
+  background: var(--md3-secondary);
+  color: var(--md3-on-secondary);
+  font-family: 'Helvetica', 'Arial', sans-serif;
 }
 
 .ankid-nav-tab {
@@ -270,7 +270,7 @@ body {
 }
 
 .ankid-section-title {
-  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-family: 'Helvetica', 'Arial', sans-serif;
   font-size: var(--md3-headline-large);
   font-weight: 700;
   color: var(--md3-primary);
@@ -279,8 +279,8 @@ body {
 }
 
 .ankid-section-subtitle {
-  font-family: 'Inter', sans-serif;
-  color: var(--md3-on-surface-variant);
+  font-family: 'Helvetica', 'Arial', sans-serif;
+  color: var(--md3-on-surface);
   text-align: center;
   font-size: var(--md3-body-large);
 }
@@ -289,8 +289,9 @@ body {
   width: 100%;
   height: 8px;
   transition: all 500ms var(--md3-motion-easing-emphasized);
-  background: var(--md3-surface-variant);
+  background: var(--md3-surface);
   border-radius: 8px;
+  border: 1px solid var(--md3-primary);
   overflow: hidden;
 }
 
